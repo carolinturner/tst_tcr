@@ -1,0 +1,29 @@
+# Scripts for RNAseq analyses
+
+The scripts provided here were used for RNAseq analyses in the [TST TCR publication](link here once available). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 1. 
+
+Source data can be downloaded from [Array Express](https://www.ebi.ac.uk/arrayexpress), accession number E-MTAB-14687.
+ 
+Metadata = `sdrf.tsv`
+Raw counts matrix = `rawcounts.csv`
+TPM matrix = `tpm_PC0.001_log2_genesymbol_dedup.csv`
+
+To make:
+* **Figure S1A**: RNAseq_script_1 &rarr; RNAseq_script_2 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_6 &rarr; Gephi network visualisation
+* **Figure S1B**: RNAseq_script_1 &rarr; RNAseq_script_3 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_7 &rarr; Gephi network visualisation
+* **Figure S1C-D**: RNAseq_script_1 &rarr; RNAseq_script_4 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_8 &rarr; Plotting_script_FigureS1C-D
+* **Figure S1E**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; Plotting_script_FigureS1E
+* **Figure S1F**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; Plotting_script_FigureS1E &rarr; Plotting_script_FigureS1F
+* **Figure 1A-B**: RNAseq_script_1 &rarr; RNAseq_script_9 &rarr; Plotting_script_Figure1A-B
+* **Figure 1C**: RNAseq_script_1 &rarr; RNAseq_script_9 &rarr; Plotting_script_Figure1C
+
+Overview of analysis scripts:
+* `RNAseq_script_1.R`: Prepare data and differential gene expression analyses
+* `RNAseq_script_2.R`: SARtools DeSeq2 analysis (TST_D2 vs saline) and prep for subsequent analysis
+* `RNAseq_script_3.R`: SARtools DeSeq2 analysis (TST_D7 vs saline) and prep for subsequent analysis
+* `RNAseq_script_4.R`: SARtools DeSeq2 analysis (all TST vs saline) and prep for subsequent analysis
+* `RNAseq_script_5.R`: SARtools DeSeq2 analysis (D7 vs D2 within integrated TST response) and prep for subsequent analysis
+* `RNAseq_script_6.R`: Correlation analysis of upstream regulator target genes (TST_D2 vs saline) and prep for Gephi visualisation
+* `RNAseq_script_7.R`: Correlation analysis of upstream regulator target genes (TST_D7 vs saline) and prep for Gephi visualisation
+* `RNAseq_script_8.R`: Correlation analysis of upstream regulator target genes (all TST vs saline) and calculation of module scores per sample
+* `RNAseq_script_9.R`: Module analyses
