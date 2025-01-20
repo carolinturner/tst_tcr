@@ -1,0 +1,23 @@
+import numpy as np
+
+tcrdists = np.arange(0, 41, 3)
+mincounts = [2, 5, 10]
+chains = ['alpha', 'beta']
+clusterings = ['multilevel', 'leiden']
+testmethods = ['fisher']
+
+rule all:
+    input:
+        [f'/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
+          for chain in chains
+          for max_tcrdist in tcrdists
+          for mincount in mincounts
+          for testmethod in testmethods
+          for clustering in clusterings]
+
+rule metaclonotypist:
+    output:
+        '/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
+    script:
+        '/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/metaclonotypist_script.py'
+
