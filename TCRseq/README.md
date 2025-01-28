@@ -8,11 +8,7 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 * HLA imputations for participants are available as Table S3.
 * Metaclone summaries (including HLA association and regular expression patterns) are available as Tables S4-S9. These metaclones were discovered using the code availabe in the metaclone directory of this GitHub repository.
 * All source data should be saved in a subdirectory called `data`.
- 
-Metadata = `metadata.csv`
-Published antigen-reactive CDR3s = Table S2 saved as `TableS2.csv`
-HLA data = Table S3 saved as `TableS3.csv`
-Metaclone summary tables = Tables S4-S9 saved as .csv files, e.g. `TableS4.csv`
+* Supplementary tables should be saved as individual .csv files, e.g. `TableS2.csv`
 
 **Overview of scripts:**
 * `TCRseq_script_1.R`: Pre-processing of data
