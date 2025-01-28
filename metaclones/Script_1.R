@@ -1,7 +1,11 @@
+# Script_1 (metaclone discovery): re-formatting of HLA data
+
+# save Table S3 from the manuscript as TableS3.csv in a sub-directory called data
+
 library(tidyverse)
 
 # load data
-dat <- read.csv("data/TableS2.csv")
+dat <- read.csv("data/TableS3.csv")
 
 # select relevant columns and split HLA gene and allele
 dat1 <- dat %>%

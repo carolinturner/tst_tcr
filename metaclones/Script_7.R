@@ -1,3 +1,9 @@
+# Script_5 (metaclone discovery): tidy Gliph2 output
+# - add 'pattern' to each cluster;
+# - remove any 'local' patterns;
+# - convert pattern to regex;
+# - retain only most significant HLA association
+
 library(tidyverse)
 
 # change here
@@ -36,4 +42,5 @@ gliph$pattern <- gsub("%",".",gliph$pattern)
 gliph$X <- NULL
 gliph <- gliph %>% group_by(cluster) %>% slice_min(pvalue) %>% ungroup()
 
-write.csv(gliph,paste0("Suppl_table_gliph2_beta_mhc",mhc_class,".csv"),row.names = F)
+table <- if(mhc_class == "II"){"Table_S6"}else{"Table_S9"}
+write.csv(gliph,paste0(table,"_gliph2_beta_mhc",mhc_class,".csv"),row.names = F)

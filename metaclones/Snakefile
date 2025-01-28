@@ -8,7 +8,7 @@ testmethods = ['fisher']
 
 rule all:
     input:
-        [f'/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
+        [f'results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
           for chain in chains
           for max_tcrdist in tcrdists
           for mincount in mincounts
@@ -17,7 +17,7 @@ rule all:
 
 rule metaclonotypist:
     output:
-        '/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
+        'results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
     script:
-        '/Users/rishikasaxena/TRACERx_TCR_signatures-1/TST/metaclonotypist_script.py'
+        'Script_3.py'
 
