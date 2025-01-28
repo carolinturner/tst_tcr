@@ -12,6 +12,7 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 Metadata = `metadata.csv`
 Published antigen-reactive CDR3s = Table S2 saved as `TableS2.csv`
 HLA data = Table S3 saved as `TableS3.csv`
+Metaclone summary tables = Tables S4-S9 saved as .csv files, e.g. `TableS4.csv`
 
 **Overview of scripts:**
 * `TCRseq_script_1.R`: Pre-processing of data
