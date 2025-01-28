@@ -1,4 +1,4 @@
-# TCRseq_script_7: Expansion of Mtb-reactive TCRs in TST between day 2 and day 7
+# TCRseq_script_8: Expansion of Mtb-reactive TCRs in TST between day 2 and day 7
 # Script adapted from Benny Chain
 
 library(data.table)
