@@ -29,8 +29,6 @@ HLA data = Table S3 saved as `TableS3.csv`
 * Change `MHC class` in repeated runs of `Script_6` to test separately MHC II or MHC I associations of Gliph2 patterns (applied to beta chain repertoires only).
 * Change `mhc_class` in repeated runs of `Script_7` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 
-**To make main figures:**
-* **Figure 4C**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Plotting_script_Figure4C
-
-**To make supplementary figures:**
-* **Figure S7A**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Plotting_script_FigureS7A
+**To make:**
+* **Figure 4C-E**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_Figure4C-E
+* **Figure S7A-C**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_FigureS7A-C
