@@ -64,7 +64,7 @@ for(chain in c("alpha","beta")){
     # log2 transform counts
     df.log <- df %>% mutate(across(where(is.numeric), ~log2(.)))
 
-    # subtract blood counts from PBMC data and filter for CDR3s with stimultation index >= expansion threshold
+    # subtract blood counts from PBMC data and filter for CDR3s with stimulation index >= expansion threshold
     df.log <- df.log %>%
       mutate(SI = PBMC - Blood) %>%
       filter(SI >= exp)
