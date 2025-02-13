@@ -1,6 +1,5 @@
 library(tidyverse)
 library(rstatix)
-library(ggpubr)
 
 #My_Theme
 t = 10 #size of text

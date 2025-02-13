@@ -1,6 +1,5 @@
 library(tidyverse)
 library(rstatix)
-library(ggpubr)
 
 #My_Theme
 t = 10 #size of text
@@ -61,7 +60,8 @@ ggplot(summary, aes(x=tissue,y=pct))+
        y="% of all CDR3s (down-sampled)") +
   My_Theme+
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(20),log10(40),log10(80)))
+  expand_limits(y=130)+
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))
 
 # Figure S3B: full repertoires, beta ####
 a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_beta.csv")
@@ -145,4 +145,5 @@ ggplot(summary, aes(x=tissue,y=pct))+
        y="% of all CDR3s (down-sampled)") +
   My_Theme+
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(20),log10(40),log10(80)))
+  expand_limits(y=130)+
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))

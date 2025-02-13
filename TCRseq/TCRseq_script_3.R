@@ -8,24 +8,22 @@ ref <- read.csv("data/TableS2.csv")
 
 # Step 1: full repertoires ####
 alpha <- fread("data/combined_alpha.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7"))
+  filter(tissue %in% c("Blood","TST_D2","TST_D7")) %>%
+  group_by(sample,junction_aa) %>%
+  mutate(cdr3_count = sum(duplicate_count)) %>%
+  ungroup()
 beta <- fread("data/combined_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood", "TST_D2", "TST_D7"))
+  filter(tissue %in% c("Blood", "TST_D2", "TST_D7")) %>%
+  group_by(sample,junction_aa) %>%
+  mutate(cdr3_count = sum(duplicate_count)) %>%
+  ungroup()
 
 # loop through different expansion thresholds and quantify published CDR3s
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
-  dat.a <- alpha %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
-  dat.b <- beta %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+  dat.a <- alpha %>% filter(cdr3_count >f)
+  dat.b <- beta %>% filter(cdr3_count >f)
   
   for (Chain in c("alpha","beta")){
     print(paste0("Chain: ",Chain))
@@ -43,11 +41,13 @@ for (f in c(0:1)) {
     
     # summary dataframe
     summary <- dat %>% filter(!if_all(c(CMV,EBV,Mtb), is.na))
+    write.csv(summary,paste0("data/Published-Ag-search_full-repertoires_expanded_gr",f,"_",Chain,".csv"),row.names = F)
     
     # sum total counts for each sample
     dat <- dat %>%
       group_by(tissue,sample) %>%
-      summarise(count = sum(duplicate_count))
+      summarise(count = sum(duplicate_count)) %>%
+      ungroup()
     
     # sum Ag-reactive counts for each sample
     CMV.dat <- summary %>%
@@ -68,17 +68,17 @@ for (f in c(0:1)) {
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "CMV") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     merge.EBV <- left_join(dat,EBV.dat) %>%
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "EBV") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     merge.Mtb <- left_join(dat,Mtb.dat) %>%
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "Mtb") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     
     # save summary file
     summary <- rbind(merge.CMV,merge.EBV,merge.Mtb)
@@ -87,26 +87,23 @@ for (f in c(0:1)) {
 }
 
 # Step2: down-sampled repertoires ####
-
 alpha <- fread("data/combined_subsampled_alpha.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7"))
+  filter(tissue %in% c("Blood","TST_D2","TST_D7")) %>%
+  group_by(sample,junction_aa) %>%
+  mutate(cdr3_count = sum(duplicate_count)) %>%
+  ungroup()
 beta <- fread("data/combined_subsampled_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood", "TST_D2", "TST_D7"))
+  filter(tissue %in% c("Blood", "TST_D2", "TST_D7")) %>%
+  group_by(sample,junction_aa) %>%
+  mutate(cdr3_count = sum(duplicate_count)) %>%
+  ungroup()
 
 # loop through different expansion thresholds and quantify published CDR3s
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
-  dat.a <- alpha %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
-  dat.b <- beta %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+  dat.a <- alpha %>% filter(cdr3_count >f)
+  dat.b <- beta %>% filter(cdr3_count >f)
   
   for (Chain in c("alpha","beta")){
     print(paste0("Chain: ",Chain))
@@ -124,11 +121,13 @@ for (f in c(0:1)) {
     
     # summary dataframe
     summary <- dat %>% filter(!if_all(c(CMV,EBV,Mtb), is.na))
-
+    write.csv(summary,paste0("data/Published-Ag-search_down-sampled_expanded_gr",f,"_",Chain,".csv"),row.names = F)
+    
     # sum total counts for each sample
     dat <- dat %>%
       group_by(tissue,sample) %>%
-      summarise(count = sum(duplicate_count))
+      summarise(count = sum(duplicate_count)) %>%
+      ungroup()
     
     # sum Ag-reactive counts for each sample
     CMV.dat <- summary %>%
@@ -149,17 +148,17 @@ for (f in c(0:1)) {
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "CMV") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     merge.EBV <- left_join(dat,EBV.dat) %>%
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "EBV") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     merge.Mtb <- left_join(dat,Mtb.dat) %>%
       mutate(pct = ag.count/count*100,
              pct = replace_na(pct,0),
              Antigen = "Mtb") %>%
-      select(tissue,Antigen,pct)
+      select(sample,tissue,Antigen,pct)
     
     # save summary file
     summary <- rbind(merge.CMV,merge.EBV,merge.Mtb)
