@@ -22,7 +22,7 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 * `TCRseq_script_9.R`: Calculate abundance of metaclones in blood and TST 
 * `TCRseq_script_10.R`: Identify most abundant and most public metaclones in day 7 TST
 * `TCRseq_script_11.R`: Calculate abundance of metaclones and gliph2 patterns in validation datasets **(TO DO)**
-* `TCRseq_script_12.R`: Compare abundance of metaclones and published Mtb-reactive TCRs **(TO DO)**
+* `TCRseq_script_12.R`: Compare abundance of metaclones and published Mtb-reactive TCRs
 * `TCRseq_script_13.R`: Compare abundance of metaclones and private Mtb-reactive TCRs
 * `TCRseq_script_14.R`: Assess publicity of Mtb-reactive TCRs in day 7 TST
 
@@ -49,6 +49,6 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 * **Figure S6B**: TCRseq_script_1 &rarr; TCRseq_script 6 &rarr; TCRseq_script_8 &rarr; Plotting_script_FigureS6B
 * **Figure S8A**: TCRseq_script_1 &rarr; TCRseq_script_11 &rarr; Plotting_script_FigureS8A **(TO DO)**
 * **Figure S8B-D**: TCRseq_script_1 &rarr; TCRseq_script_9 &rarr; Plotting_script_FigureS8B-D 
-* **Figure S9**: TCRseq_script_1 &rarr; TCRseq_script_9 &rarr; Plotting_script_FigureS9 **(TO DO)**
+* **Figure S9**: TCRseq_script_1 &rarr; TCRseq_script_12 &rarr; Plotting_script_FigureS9
 * **Figure S10**: TCRseq_script_1 &rarr; TCRseq_script_6 and TCRseq_script_7 &rarr; TCRseq_script_13 &rarr; Plotting_script_FigureS10
-* **Figure S11**: TCRseq_script_1 &rarr; TCRseq_script_3 and TCRseq_script_9 &rarr; TCRseq_script_14 & Plotting_script_FigureS11
+* **Figure S11**: TCRseq_script_1 &rarr; TCRseq_script_3 and TCRseq_script_9 &rarr; TCRseq_script_14 &rarr; Plotting_script_FigureS11
