@@ -1,17 +1,25 @@
 # TCRseq_Script_1: Pre-processing of bulk TCRseq data
-# - tidy metadata file
-# - tidy HLA data file
-# - combine samples in one file
-# - down-sample repertoires
+
+## Dataset 1:
+# - bulk TCRseq of blood, TST and in vitro stimulated PBMC
+# - acquired with UCL Chain lab protocol
+# - pre-processing: tidy metadata and HLA file, combine samples in one file, down-sample repertoires
+
+## Dataset 2 (used for validation in Figure 5A and Supplementary Figure S8A):
+# - bulk TCRseq of lung tissue and blood from TB and cancer patients, and of sorted CD4 T cells from TB lung
+# - acquired with ImmunoSeq protocol
+# - pre-processing: tidy metadata, combine samples in one file
 
 # download TCRseq data and metadata from UCL's Research Data Repository: DOI 10.5522/04/28049606
+# download HLA data from manuscript, save as TableS3.csv
 # save all source data in a sub-directory called data
 
 library(tidyverse)
 library(data.table)
 
+## Dataset 1:
 # Step 1: make tidy metadata and HLA files ####
-# meatdata
+# metadata
 meta <- read.csv("data/metadata.csv") %>%
   filter(Data_generation_protocol == "UCL_Chain_lab") %>%
   mutate(sample = paste0(UIN,"_",tissue,"_",chain)) %>%
@@ -159,4 +167,51 @@ for (chain in c("alpha","beta")){
     summary <- rbind(summary,d)
   }
   fwrite(summary,file = paste0("data/combined_subsampled_",chain,".csv.gz"))
+}
+
+
+## Dataset 2:
+# Step 1: make tidy metadata file ####
+# metadata
+meta <- read.csv("data/metadata.csv") %>%
+  filter(Data_generation_protocol == "ImmunoSeq") %>%
+  mutate(disease_group = case_match(disease_group,
+                                    "Lung cancer" ~ "Cancer",
+                                    "tuberculosis disease" ~ "TB"),
+         sample = paste0(UIN,"_",Dataset,"_",disease_group,"_",chain)) %>%
+  select(sample,Filename_processed,UIN,chain,Dataset,disease_group,tissue)
+write.csv(meta,"data/ImmunoSeq_metadata.csv",row.names = F)
+
+# Step 2: combine full repertoires in one file per chain ####
+# split metadata by chain
+meta.a <- meta %>% filter(chain == "alpha") 
+meta.b <- meta %>% filter(chain == "beta")
+
+# combine repertoires and add relevant metadata annotations
+for (chain in c("alpha","beta")){
+  print(paste0("Chain: ",chain))
+  m <- if(chain == "alpha"){meta.a}else{meta.b}
+  summary <- data.frame()
+  for (i in 1:nrow(m)){
+    print(paste0("Sample: ",i," of ",nrow(m)))
+    
+    d <- read.delim(paste0("data/",m[i,"Filename_processed"]),sep="\t") %>%
+      filter(sequenceStatus == "In") # keep only productive rearrangements
+    d <- d %>%
+      mutate(vAssign = gsub("\\*.*","",d$vMaxResolved), jAssign = gsub("\\*.*","",d$jMaxResolved)) # V gene annotation
+    d <- d %>%
+      group_by(aminoAcid,vAssign,jAssign) %>%
+      mutate(duplicate_count = sum(count..templates.reads.)) %>% # count by TCR
+      select(aminoAcid,vAssign,jAssign,duplicate_count,) %>%
+      unique() %>%
+      ungroup()
+    
+    d$UIN <- m[i,"UIN"]
+    d$dataset <- m[i,"Dataset"]
+    d$group <- if(m[i,"Dataset"] == "CD4-T"){m[i,"tissue"]}else{m[i,"disease_group"]}
+    d$sample <- m[i,"sample"]
+    d$bioidentity <- paste0(d$vAssign,d$aminoAcid,d$jAssign)
+    summary <- rbind(summary,d)
+  }
+  fwrite(summary,file = paste0("data/ImmunoSeq_combined_",chain,".csv.gz"))
 }
