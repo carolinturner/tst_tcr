@@ -1,12 +1,12 @@
-## RNAseq_script_8: Identification of statistically significant co-regulated upstream regulator modules (all TST vs saline)
+## RNAseq_script_7: Identification of statistically significant co-regulated upstream regulator modules (TST_D7 vs saline)
 
 # script adapted from Blanca Sanz-Magallon Duque De Estrada
 
 library(tidyverse)
 
 ## A. Input files - replace as necessary
-tpm <- read.csv("tpm_TST-transcriptome.csv", row.names = 1)
-ipa <- read.table("IPA_output/TSTvsSaline.txt", sep = "\t", skip=2, header=T)
+tpm <- read.csv("tpm_D7-transcriptome.csv", row.names = 1)
+ipa <- read.table("IPA_output/TSTd7vsSaline.txt", sep = "\t", skip=2, header=T)
 meta <- read.csv("RNAseq_metadata.csv", header = TRUE, row.names = 1)
 
 ## B. Create a co-correlation matrix of the TST transcriptome (including only relevant TST samples)
@@ -53,7 +53,7 @@ ipa_sep_reduced <- merge(ipa_sep_reduced, avg_interactomes, by.x = "regulator", 
 ## notes:
 ##   p = the maximum size of the group of genes to test (ie. range 4 - k). 4 is the lowest number for the range, the correlation function doesn't work for size < 4
 ##   r = the number of random samples used to calculate the frequency distribution for a given size -- the larger the number the more accurate, but at the cost of longer running time
-p <- 648 # check ipa_sep_reduced for largest count
+p <- 578 # check ipa_sep_reduced for largest count
 r <- 100
 gene_names <- rownames(TST_transcriptome)
 
@@ -90,42 +90,61 @@ ipa_less_0.05$adj_pvalue <- ipa_less_0.05$pvalue*fdr_threshold # calculating the
 ipa_significant <- ipa_less_0.05[which(ipa_less_0.05$adj_pvalue <= 0.05),] # selecting clusters with adj. p-value <= 0.05
 
 ## G. Output file
-write.csv(ipa_significant, "URA_TSTvsSaline_fdrsig_648size.csv", row.names = F) # clusters with adj. p-value <= 0.05
+write.csv(ipa_significant, "URA_TSTd7vsSaline_fdrsig_578size.csv", row.names = F) # clusters with adj. p-value <= 0.05
 
-## H. Format files
-rownames(ipa_significant) <- ipa_significant$regulator
+# prepare input files for Gephi
+# add correlation analysis outcome to filtered IPA results
+ipa_significant <- ipa_significant %>% 
+  select(regulator, adj_pvalue)
+ipa <- ipa %>% left_join(ipa_significant, by = "regulator")
+ipa$significant.in.correl.analysis <- ifelse(ipa$adj_pvalue < 0.05, "Yes", "No")
+ipa <- ipa %>% select(-adj_pvalue)  
 
-ipa <- ipa %>% select(regulator,type,FDR,target)
-rownames(ipa) <- ipa$regulator
-ipa <- ipa[which(rownames(ipa)%in%rownames(ipa_significant)),]
-rownames(ipa_significant)%in%rownames(ipa) # must all be TRUE (displayed in the console below)
-ipa <- tibble::rowid_to_column(ipa, "ID") #add an ID column corresponding to each cluster
-ipa$target <- as.character(ipa$target) 
+# select only significant upstream regulators
+dat <- subset(ipa, significant.in.correl.analysis == "Yes")
+dat <- dat %>% select(regulator,type,target,FDR)
 
-ipa_sep <- separate_rows(ipa, target, sep = ",|/", convert = TRUE) #separate clusters into individual rows
-ipa_sep <- subset(ipa_sep, target %in% rownames(tpm)) #only the ones in the correlation matrix
-ipa_sep %>%
-  group_by(regulator) %>%
-  mutate("count" = n()) -> ipa_sep
+# transform p-values so that most significant regulator is associated with largest value
+dat$FDR <- log10(dat$FDR) * (-1)
 
-## I. Calculate mean cluster expression per sample
-sample_cluster_expression <- matrix(0, nrow=0, ncol=1+ncol(tpm))
-colnames(sample_cluster_expression) <- c("regulator",colnames(tpm))
+########################
+## Make a 'Node' file ##
+########################
 
-for (i in 1:max(ipa$ID)){ 
-  ipa_sep %>%
-    filter(ID == i) -> hub
-  genes <- hub$target[which(hub$target %in% row.names(tpm))]
-  average_expression_list <- matrix(0, nrow=1, ncol=0)
-  average_expression_list <- cbind(as.character(unique(hub$regulator)),average_expression_list)
-  for (j in 1:ncol(tpm)){
-    sample_values <- tpm[genes,j]
-    average_expression <- mean(sample_values)
-    average_expression_list <- cbind(average_expression_list, average_expression)
-  }
-  sample_cluster_expression <- rbind(sample_cluster_expression, average_expression_list)
-}
+# make an upstream regulator and gene vector
+UR <- dat$regulator
+gene <- unique(unlist(strsplit(dat$target, split = ",")))
 
-## J. Output files
-write.csv(sample_cluster_expression, "TST_fdrsig_UR_module_expression_per_sample.csv", row.names = FALSE)
+# make weight vectors
+weight.UR <- dat$FDR
+weight.gene <- rep(1, times = length(gene))
 
+# make class vectors for upstream regulators and genes
+class.UR <- dat$type
+class.gene <- rep("Gene", times = length(gene)) 
+
+# make a 'node' data frame and save to .csv file
+node.df <- data.frame(Id = c(UR,gene),
+                      Label = c(UR, gene),
+                      Class = c(class.UR, class.gene),
+                      Weight = c(weight.UR, weight.gene))
+
+write.csv(node.df, "Nodes_TSTd7vsSaline.csv", row.names = F)
+
+#########################
+## Make an 'Edge' file ##
+#########################
+
+# drop FDR and type column
+dat <- dat %>% select(-c(FDR, type))
+
+# make a separate row for each combination of upstream regulator and target molecule
+edge <- tidyr::separate_rows(dat, target, sep=",")
+
+# add a column specifying the edge type
+edge$Type <- "undirected"
+
+# change column names and save to file
+colnames(edge) <- c("Target", "Source", "Type")
+
+write.csv(edge, "Edges_TSTd7vsSaline.csv", row.names = F)
