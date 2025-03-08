@@ -1,4 +1,4 @@
-# Script_5 (metaclone discovery): tidy Gliph2 output
+# Script_7 (metaclones): tidy Gliph2 output
 # - add 'pattern' to each cluster;
 # - remove any 'local' patterns;
 # - convert pattern to regex;

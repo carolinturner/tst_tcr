@@ -346,7 +346,7 @@ for (chain in c("alpha","beta")){
       match <- dat %>% filter(str_detect(IR_VDJ_1_cdr3, regex.beta))
       # add columns to indicate match and metaclone index
       if (dim(match)[1] != 0){
-        match$mc.index1 <- index
+        match$mc.index1 <- regex.beta
         match$mc.match1 <- 1
         # add to summary file
         summary1 <- rbind(summary1,match)
@@ -363,7 +363,7 @@ for (chain in c("alpha","beta")){
       match <- dat %>% filter(str_detect(IR_VDJ_2_cdr3, regex.beta))
       # add columns to indicate match and metaclone index
       if (dim(match)[1] != 0){
-        match$mc.index2 <- index
+        match$mc.index2 <- regex.beta
         match$mc.match2 <- 1
         # add to summary file
         summary2 <- rbind(summary2,match)
@@ -454,7 +454,7 @@ for (chain in c("alpha","beta")){
       match <- dat %>% filter(str_detect(bioidentity,regex.beta))
       # add columns to indicate match and metaclone index
       if (dim(match)[1] != 0){
-        match$mc.index <- index
+        match$mc.index <- regex.beta
         match$mc.match <- 1
         # add to summary file
         summary <- rbind(summary,match)
@@ -539,7 +539,7 @@ for (chain in c("alpha","beta")){
       match <- dat %>% filter(str_detect(bioidentity,regex.beta))
       # add columns to indicate match and metaclone index
       if (dim(match)[1] != 0){
-        match$mc.index <- index
+        match$mc.index <- regex.beta
         match$mc.match <- 1
         # add to summary file
         summary <- rbind(summary,match)
@@ -642,11 +642,11 @@ for (chain in c("alpha","beta")){
     # sum up total gliph count for each dataset/group combination
     gliph.dat <- summary %>%
       group_by(dataset, group) %>%
-      summarise(total.gliph.count = sum(duplicate_count))
+      summarise(total.mc.count = sum(duplicate_count))
     # merge dataframes and calculte mc.percentages
     merge <- inner_join(dat,gliph.dat) # samples with no gliph patterns discarded
     merge <- merge %>%
-      mutate(gliph.mc.total = round(total.mc.count/total.count*100,3))
+      mutate(mc.pct.total = round(total.mc.count/total.count*100,3))
     # save to file
     write.csv(merge,paste0("data/Validation_ImmunoSeq-bulk_gliph2_results_",chain,".csv"),row.names = F)
   }
@@ -774,8 +774,7 @@ mc.dat <- rbind(d1,d2,d3,d4,d5,d6) %>%
 
 ## data for plotting
 dat <- mc.dat %>%
-  select(tissue,mc.pct.total) %>%
-  separate_wider_delim(tissue, "_", names = c("dataset","Stimulant")) %>%
+  select(dataset,Stimulant,mc.pct.total) %>%
   mutate(dataset = recode(dataset,
                           'PBMC' = "PBMC (bulk-TCRseq)",
                           'Tcells' = "T-cells (sc-TCRseq)",
