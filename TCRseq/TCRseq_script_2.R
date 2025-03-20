@@ -9,14 +9,14 @@ library(entropy)
 meta <- read.csv("data/TCRseq_metadata.csv") %>%
   select(sample,tissue)
 
-# define Simpson function
-### unbiased Simpson index, as in E. H. Simpson, Nature 163, 688 (1949); and as
-### extended in Tiffeau-Mayer, Phys. Rev. E 109 (2024): https://doi.org/10.1103/PhysRevE.109.064411
+# define inverse Simpson function
+### population Simpson index, as in E. H. Simpson, Nature 163, 688 (1949)
 ## the input is a vector of TCR counts
 
-simpson.sample=function(x){
+invsimpson.population=function(x){
   n=sum(x,na.rm=TRUE)
-  pc=sum((x-1)*x/(n*(n-1)))
+  p=x/n
+  pc=sum(p^2)
   sp_d=1/(pc)
   sp_d
 }
@@ -34,8 +34,8 @@ for (chain in c("alpha","beta")){
   # create empty vectors
   richness <- c()
   ginis <- c()
-  shannons.bits <- c()
-  simpson <- c()
+  shannons <- c()
+  invsimpson <- c()
   sum_expanded <- c()
   sample <- c()
   
@@ -47,16 +47,16 @@ for (chain in c("alpha","beta")){
     # rename columns
     colnames(d) <- c("CDR3", "count")
     # calculate metrics
-    richness <- c(richness, length(d[[2]])/sum(d[[2]]))
+    richness <- c(richness, length(d[[2]]))
     ginis <- c(ginis, ineq(d[[2]]))
-    shannons.bits <- c(shannons.bits, entropy(d[[2]], unit="log2"))
-    simpson <- c(simpson, simpson.sample(d[[2]]))
+    shannons <- c(exp(shannons.bits), entropy(d[[2]], method="ml"))
+    invsimpson <- c(invsimpson, invsimpson.population(d[[2]]))
     # subset to expanded clones (count >1)
     exp <- subset(d, count > 1)
     sum_expanded <- c(sum_expanded, sum(exp[[2]]))
     sample <- c(sample,i)
   }
-  summary <- data.frame(sample,richness,ginis,shannons.bits,simpson,sum_expanded)
+  summary <- data.frame(sample,richness,ginis,shannons,invsimpson,sum_expanded)
   summary <- merge(summary,meta)
   write.csv(summary,file=paste0("data/Diversity_full-repertoires_",chain,".csv"),row.names = F)
 }
@@ -76,7 +76,7 @@ for (chain in c("alpha","beta")){
   richness <- c()
   ginis <- c()
   shannons.bits <- c()
-  simpson <- c()
+  invsimpson <- c()
   sum_expanded <- c()
   sample <- c()
   
@@ -87,17 +87,16 @@ for (chain in c("alpha","beta")){
     d <- d %>% group_by(junction_aa) %>% summarise(total = sum(duplicate_count))
     # rename columns
     colnames(d) <- c("CDR3", "count")
-    # calculate metrics
-    richness <- c(richness, length(d[[2]])/sum(d[[2]]))
+    richness <- c(richness, length(d[[2]]))
     ginis <- c(ginis, ineq(d[[2]]))
-    shannons.bits <- c(shannons.bits, entropy(d[[2]], unit="log2"))
-    simpson <- c(simpson, simpson.sample(d[[2]]))
+    shannons <- c(exp(shannons.bits), entropy(d[[2]], method="ml"))
+    invsimpson <- c(invsimpson, invsimpson.population(d[[2]]))
     # subset to expanded clones (count >1)
     exp <- subset(d, count > 1)
     sum_expanded <- c(sum_expanded, sum(exp[[2]]))
     sample <- c(sample,i)
   }
-  summary <- data.frame(sample,richness,ginis,shannons.bits,simpson,sum_expanded)
+  summary <- data.frame(sample,richness,ginis,shannons,invsimpson,sum_expanded)
   summary <- merge(summary,meta)
   write.csv(summary,file=paste0("data/Diversity_down-sampled_",chain,".csv"),row.names = F)
 }
