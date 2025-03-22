@@ -24,11 +24,10 @@ HLA data = Table S3 saved as `TableS3.csv`
 	````
 	Output files are saved in a directory called `results`.
 * `Script_4` combines all output files from the `results` folder into one data frame.
-* Change `chain` and `MHC class` in repeated runs of `Script_5` to perform metaclonotypist analysis separately on alpha or beta chain repertoires, testing separately for MHC II or MHC I associations. 
+* Change `MHC class` in repeated runs of `Script_5` to test separately for MHC II or MHC I associations in metaclonotypist analysis. 
 * Repeated analysis of the same dataset using metaclonotypist (`Script_5`) with identical settings may result in slightly different results. This is due to stochasticity of the Leiden clustering step of the metaclonotypist function, implemented through `igraph`, where no reproducibility seed can be supplied.
-* Change `MHC class` in repeated runs of `Script_6` to test separately MHC II or MHC I associations of Gliph2 patterns (applied to beta chain repertoires only).
+* Change `MHC class` in repeated runs of `Script_6` to test separately MHC II or MHC I associations of Gliph2 patterns.
 * Change `mhc_class` in repeated runs of `Script_7` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 
 **To make:**
 * **Figure 4C-E**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_Figure4C-E
-* **Figure S7A-C**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_FigureS7A-C
