@@ -13,8 +13,8 @@ HLA data = Table S3 saved as `TableS3.csv`
 * `Script_3.py` and `Snakefile`: Parameter sweep to identify optimal Metaclonotypist parameters for this dataset
 * `Script_4.ipynb`: Tidy up and explore output from parameter sweep through plots
 * `Script_5.ipynb`: Metaclonotypist analysis
-* `Script_6.ipynb`: Gliph2 analysis
-* `Script_7.R`: Tidy up Gliph2 output (including conversion to regex patterns)
+* `Script_6.ipynb`: Gliph2 analysis, followed by HLA association test as implemented in Metaclonotypist
+* `Script_7.R`: Add regex pattern to Gliph2 clusters
 
 **Notes:**
 * Down-sampling in `Script_2` has been done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis.
@@ -26,7 +26,8 @@ HLA data = Table S3 saved as `TableS3.csv`
 * `Script_4` combines all output files from the `results` folder into one data frame.
 * Change `MHC class` in repeated runs of `Script_5` to test separately for MHC II or MHC I associations in metaclonotypist analysis. 
 * Repeated analysis of the same dataset using metaclonotypist (`Script_5`) with identical settings may result in slightly different results. This is due to stochasticity of the Leiden clustering step of the metaclonotypist function, implemented through `igraph`, where no reproducibility seed can be supplied.
-* Change `MHC class` in repeated runs of `Script_6` to test separately MHC II or MHC I associations of Gliph2 patterns.
+* Install Gliph2 in a Linux or Mac environment (http://50.255.35.37:8080/tools) before running `Script_6`
+* Change `mhc_class` in repeated runs of `Script_6` to test separately MHC II or MHC I associations of Gliph2 patterns.
 * Change `mhc_class` in repeated runs of `Script_7` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 
 **To make:**

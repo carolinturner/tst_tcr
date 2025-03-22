@@ -2,8 +2,8 @@ import numpy as np
 
 tcrdists = np.arange(0, 41, 3)
 mincounts = [2, 5, 10]
-chains = ['alpha', 'beta']
-clusterings = ['multilevel', 'leiden']
+chains = ['beta']
+clusterings = ['leiden']
 testmethods = ['fisher']
 
 rule all:
