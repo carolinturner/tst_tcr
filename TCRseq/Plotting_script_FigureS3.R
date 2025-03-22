@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggpubr)
 library(rstatix)
 
 #My_Theme
@@ -17,133 +18,157 @@ My_Theme = theme(
   strip.text = element_text(size=t, face = "bold", colour = tc),
   strip.background = element_rect(fill = "gray90", colour = "black", linewidth = 0.5),
   panel.border = element_rect(fill = NA, linewidth = 0.5, colour = tc),
-  panel.background = element_rect(fill = "gray97")
+  panel.background = element_rect(fill = "gray97"),
+  plot.background = element_rect(fill='transparent', color=NA), #transparent plot bg
+  legend.position = "right", legend.justification = "top"
 )
 
-# Figure S3A: down-sampled, alpha ####
-a <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr0_alpha.csv")
-b <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr1_alpha.csv")
+# Figure S2A: down-sampled, alpha ####
+d <- read.csv("data/Hill-diversity_TCR_down-sampled_alpha.csv")
 
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
-
-# number of published sequences
-ref <- read.csv("data/TableS2.csv") %>%
-  filter(chain == "alpha")
-CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
-CMV <- format(c(CMV),big.mark=",", trim=TRUE)
-EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
-EBV <- format(c(EBV),big.mark=",", trim=TRUE)
-Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
-Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
-
-summary <- rbind(a,b) %>%
+dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
-                         TST_D7 = "Day 7 TST"),
-         Antigen = recode(Antigen,
-                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
-                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
-                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
+                         TST_D7 = "Day 7 TST")) %>%
+  select(richness,shannons,invsimpson,sum_expanded,tissue)
+
+# scaled data
+zdat <- dat %>%
+  mutate(richness = c(scale(richness,scale = T, center = T)),
+         shannons = c(scale(shannons, scale = T, center = T)),
+         invsimpson = c(scale(invsimpson, scale = T, center = T)),
+         sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
+  ungroup()
+
+# prep for plotting
+zdat.long <- zdat %>%
+  pivot_longer(cols = richness:sum_expanded,
+               names_to = "Metric",
+               values_to = "Value") %>%
+  mutate(Metric = recode(Metric,
+                         richness = "Richness (D_0)",
+                         shannons = "Shannon-Hill (D_1)",
+                         invsimpson = "Simpson-Hill (D_2)",
+                         sum_expanded = "No. expanded TCRs"))
+
+zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
+  "No. expanded TCRs",
+  "Richness (D_0)",
+  "Shannon-Hill (D_1)",
+  "Simpson-Hill (D_2)"
+))
 
 # stats
-stats <- summary %>%
-  group_by(Antigen,Clone.Size) %>%
-  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
+stats <- zdat.long %>%
+  group_by(Metric) %>%
+  pairwise_wilcox_test(data = ., Value~tissue, p.adjust.method = "fdr")
 
-# plot (save as svg 600x500)
-ggplot(summary, aes(x=tissue,y=pct))+
+# plot (save as svg 1000x350)
+ggplot(zdat.long,aes(tissue,Value))+
   geom_boxplot(colour="red")+
-  facet_grid(Clone.Size~Antigen)+
-  scale_y_log10()+
-  labs(x="Sample",
-       y="% of all CDR3s (down-sampled)") +
-  My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  expand_limits(y=130)+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))
+  facet_wrap(~Metric,ncol=5)+
+  labs(x = "Sample", 
+       y = "Z score")+
+  My_Theme + 
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(3.5,4.5,5.5))
 
-# Figure S3B: full repertoires, beta ####
-a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_beta.csv")
-b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_beta.csv")
+# Figure S2B: full repertoires, beta ####
+d <- read.csv("data/Hill-diversity_TCR_full-repertoires_beta.csv")
 
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
-
-# number of published sequences
-ref <- read.csv("data/TableS2.csv") %>%
-  filter(chain == "beta")
-CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
-CMV <- format(c(CMV),big.mark=",", trim=TRUE)
-EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
-EBV <- format(c(EBV),big.mark=",", trim=TRUE)
-Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
-Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
-
-summary <- rbind(a,b) %>%
+dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
-                         TST_D7 = "Day 7 TST"),
-         Antigen = recode(Antigen,
-                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
-                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
-                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
+                         TST_D7 = "Day 7 TST")) %>%
+  select(richness,shannons,invsimpson,sum_expanded,tissue)
+
+# scaled data
+zdat <- dat %>%
+  mutate(richness = c(scale(richness,scale = T, center = T)),
+         shannons = c(scale(shannons, scale = T, center = T)),
+         invsimpson = c(scale(invsimpson, scale = T, center = T)),
+         sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
+  ungroup()
+
+# prep for plotting
+zdat.long <- zdat %>%
+  pivot_longer(cols = richness:sum_expanded,
+               names_to = "Metric",
+               values_to = "Value") %>%
+  mutate(Metric = recode(Metric,
+                         richness = "Richness (D_0)",
+                         shannons = "Shannon-Hill (D_1)",
+                         invsimpson = "Simpson-Hill (D_2)",
+                         sum_expanded = "No. expanded TCRs"))
+
+zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
+  "No. expanded TCRs",
+  "Richness (D_0)",
+  "Shannon-Hill (D_1)",
+  "Simpson-Hill (D_2)"
+))
 
 # stats
-stats <- summary %>%
-  group_by(Antigen,Clone.Size) %>%
-  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
+stats <- zdat.long %>%
+  group_by(Metric) %>%
+  pairwise_wilcox_test(data = ., Value~tissue, p.adjust.method = "fdr")
 
-# plot (save as svg 600x500)
-ggplot(summary, aes(x=tissue,y=pct))+
+# plot (save as svg 1000x350)
+ggplot(zdat.long,aes(tissue,Value))+
   geom_boxplot(colour="blue")+
-  facet_grid(Clone.Size~Antigen)+
-  scale_y_log10(limits = c(0.016,100))+
-  labs(x="Sample",
-       y="% of all CDR3s (down-sampled)") +
-  My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(20),log10(40),log10(80)))
+  facet_wrap(~Metric,ncol=5)+
+  labs(x = "Sample", 
+       y = "Z score")+
+  My_Theme + 
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7))
 
-# Figure S3C: full repertoires, alpha ####
-a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_alpha.csv")
-b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_alpha.csv")
+# Figure S2C: full repertoires, alpha ####
+d <- read.csv("data/Hill-diversity_TCR_full-repertoires_alpha.csv")
 
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
-
-# number of published sequences
-ref <- read.csv("data/TableS2.csv") %>%
-  filter(chain == "alpha")
-CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
-CMV <- format(c(CMV),big.mark=",", trim=TRUE)
-EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
-EBV <- format(c(EBV),big.mark=",", trim=TRUE)
-Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
-Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
-
-summary <- rbind(a,b) %>%
+dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
-                         TST_D7 = "Day 7 TST"),
-         Antigen = recode(Antigen,
-                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
-                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
-                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
+                         TST_D7 = "Day 7 TST")) %>%
+  select(richness,shannons,invsimpson,sum_expanded,tissue)
+
+# scaled data
+zdat <- dat %>%
+  mutate(richness = c(scale(richness,scale = T, center = T)),
+         shannons = c(scale(shannons, scale = T, center = T)),
+         invsimpson = c(scale(invsimpson, scale = T, center = T)),
+         sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
+  ungroup()
+
+# prep for plotting
+zdat.long <- zdat %>%
+  pivot_longer(cols = richness:sum_expanded,
+               names_to = "Metric",
+               values_to = "Value") %>%
+  mutate(Metric = recode(Metric,
+                         richness = "Richness (D_0)",
+                         shannons = "Shannon-Hill (D_1)",
+                         invsimpson = "Simpson-Hill (D_2)",
+                         sum_expanded = "No. expanded TCRs"))
+
+zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
+  "No. expanded TCRs",
+  "Richness (D_0)",
+  "Shannon-Hill (D_1)",
+  "Simpson-Hill (D_2)"
+))
 
 # stats
-stats <- summary %>%
-  group_by(Antigen,Clone.Size) %>%
-  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
+stats <- zdat.long %>%
+  group_by(Metric) %>%
+  pairwise_wilcox_test(data = ., Value~tissue, p.adjust.method = "fdr")
 
-# plot (save as svg 600x500)
-ggplot(summary, aes(x=tissue,y=pct))+
+# plot (save as svg 1000x350)
+ggplot(zdat.long,aes(tissue,Value))+
   geom_boxplot(colour="red")+
-  facet_grid(Clone.Size~Antigen)+
-  scale_y_log10()+
-  labs(x="Sample",
-       y="% of all CDR3s (down-sampled)") +
-  My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  expand_limits(y=130)+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))
+  facet_wrap(~Metric,ncol=5)+
+  labs(x = "Sample", 
+       y = "Z score")+
+  My_Theme + 
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7))

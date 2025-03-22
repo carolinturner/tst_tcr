@@ -1,6 +1,6 @@
 # Scripts for RNAseq analyses
 
-The scripts provided here were used for RNAseq analyses in the [TST TCR publication](link here once available). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 1. 
+The scripts provided here were used for RNAseq analyses in the [TST TCR publication](link here once available). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 2. 
 
 Source data can be downloaded from [Array Express](https://www.ebi.ac.uk/arrayexpress), accession number E-MTAB-14687.
  
@@ -21,10 +21,10 @@ Overview of analysis scripts:
 * `RNAseq_script_10.R`: Module analyses
 
 To make:
-* **Figure S1A**: RNAseq_script_1 &rarr; RNAseq_script_2 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_7 &rarr; Gephi network visualisation
-* **Figure S1B**: RNAseq_script_1 &rarr; RNAseq_script_3 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_8 &rarr; Gephi network visualisation
-* **Figure S1C-D**: RNAseq_script_1 &rarr; RNAseq_script_4 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_9 &rarr; Plotting_script_FigureS1C-D
-* **Figure S1E**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; Plotting_script_FigureS1E
-* **Figure S1F**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; RNAseq_script_6 &rarr; Plotting_script_FigureS1F
+* **Figure S2A**: RNAseq_script_1 &rarr; RNAseq_script_2 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_7 &rarr; Gephi network visualisation
+* **Figure S2B**: RNAseq_script_1 &rarr; RNAseq_script_3 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_8 &rarr; Gephi network visualisation
+* **Figure S2C-D**: RNAseq_script_1 &rarr; RNAseq_script_4 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_9 &rarr; Plotting_script_FigureS2C-D
+* **Figure S2E**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; Plotting_script_FigureS2E
+* **Figure S2F**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; RNAseq_script_6 &rarr; Plotting_script_FigureS2F
 * **Figure 1A-B**: RNAseq_script_1 &rarr; RNAseq_script_10 &rarr; Plotting_script_Figure1A-B
 * **Figure 1C**: RNAseq_script_1 &rarr; RNAseq_script_10 &rarr; Plotting_script_Figure1C

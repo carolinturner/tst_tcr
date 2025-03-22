@@ -1,5 +1,4 @@
 library(tidyverse)
-library(ggpubr)
 library(rstatix)
 
 #My_Theme
@@ -21,348 +20,130 @@ My_Theme = theme(
   panel.background = element_rect(fill = "gray97")
 )
 
-# Figure S4A-C: within sample coincidence ####
+# Figure S3A: down-sampled, alpha ####
+a <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr0_alpha.csv")
+b <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr1_alpha.csv")
 
-## alpha, down-sampled
-wsc <- read.csv("data/pc_withindonor_alpha_down-sampled.csv")
-wsc <- wsc %>%
+a <- a %>% mutate(Clone.Size = "All CDR3s")
+b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
+
+# number of published sequences
+ref <- read.csv("data/TableS2.csv") %>%
+  filter(chain == "alpha")
+CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
+CMV <- format(c(CMV),big.mark=",", trim=TRUE)
+EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
+EBV <- format(c(EBV),big.mark=",", trim=TRUE)
+Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
+Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
+
+summary <- rbind(a,b) %>%
   mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
+                         TST_D2 = "Day 2 TST",
+                         TST_D7 = "Day 7 TST"),
+         Antigen = recode(Antigen,
+                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
+                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
+                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
 
-stats <- wsc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "red") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-## beta, full repertoires
-wsc <- read.csv("data/pc_withindonor_beta_full-repertoires.csv")
-wsc <- wsc %>%
-  mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
-
-stats <- wsc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "blue") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-
-## alpha, full repertoires
-wsc <- read.csv("data/pc_withindonor_alpha_full-repertoires.csv")
-wsc <- wsc %>%
-  mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
-
-stats <- wsc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "red") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-
-# Figure S4D-F: cross-sample coincidence ####
-
-## alpha, down-sampled
-csc <- read.csv("data/pc_crossdonor_alpha_down-sampled.csv")
-
-csc <- csc %>%
-  mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
-stats <- csc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "red") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-
-## beta, full repertoires
-csc <- read.csv("data/pc_crossdonor_beta_full-repertoires.csv")
-
-csc <- csc %>%
-  mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
-stats <- csc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "blue") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-
-## alpha, full repertoires
-csc <- read.csv("data/pc_crossdonor_alpha_full-repertoires.csv")
-
-csc <- csc %>%
-  mutate(tissue = recode(tissue,
-                         'TST_D2'= "Day 2 TST",
-                         'TST_D7'= "Day 7 TST"))
-stats <- csc %>%
-  pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
-  add_xy_position() 
-
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
-  geom_boxplot(colour = "red") +
-  My_Theme+
-  labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
-
-
-# Figure S4G-I: TST_D7 cross-sample coincidence stratified by HLA overlap ####
-
-## alpha, down-sampled
-# HLA overlap
-a <- read.csv("data/hladist_TST_D7_alpha_down-sampled_mhcII.csv")
-a <- a %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class II")
-b <- read.csv("data/hladist_TST_D7_alpha_down-sampled_mhcI.csv")
-b <- b %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class I")
-hla <- a %>% full_join(b)
-
-# coincidence
-c <- read.csv("data/tcrsharingprob_TST_D7_alpha_down-sampled_mhcII.csv")
-c <- c %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class II")
-d <- read.csv("data/tcrsharingprob_TST_D7_alpha_down-sampled_mhcI.csv")
-d <- d %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class I")
-
-csc <- c %>% full_join(d)
-
-# combine data
-dat <- full_join(hla,csc)
-
-# regression coefficient + 95% CI
-reg1 <- dat %>%
-  filter(mhc == "MHC class II") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff1 <- reg1$coefficients[2]
-ci1 <- confint(reg1, 'HLA.dist', level=0.95)
-
-reg2 <- dat %>%
-  filter(mhc == "MHC class I") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff2 <- reg2$coefficients[2]
-ci2 <- confint(reg2, 'HLA.dist', level=0.95)
-
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4G_regression-analysis_alpha_down-sampled.csv",row.names = F)
+# stats
+stats <- summary %>%
+  group_by(Antigen,Clone.Size) %>%
+  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
 
 # plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
-  geom_jitter(aes(alpha = 0.5)) +
-  geom_smooth(method = "lm")+
-  scale_y_log10(limits = c(7e-7,3e-5))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
-  facet_wrap(~mhc,scales = "free_x")+
-  labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+ggplot(summary, aes(x=tissue,y=pct))+
+  geom_boxplot(colour="red")+
+  facet_grid(Clone.Size~Antigen)+
+  scale_y_log10()+
+  labs(x="Sample",
+       y="% of all CDR3s (down-sampled)") +
   My_Theme+
-  theme(legend.position="none")
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
+  expand_limits(y=130)+
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))
 
+# Figure S3B: full repertoires, beta ####
+a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_beta.csv")
+b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_beta.csv")
 
-## beta, full repertoires
-# HLA overlap
-a <- read.csv("data/hladist_TST_D7_beta_full-repertoires_mhcII.csv")
-a <- a %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class II")
-b <- read.csv("data/hladist_TST_D7_beta_full-repertoires_mhcI.csv")
-b <- b %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class I")
-hla <- a %>% full_join(b)
+a <- a %>% mutate(Clone.Size = "All CDR3s")
+b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
 
-# coincidence
-c <- read.csv("data/tcrsharingprob_TST_D7_beta_full-repertoires_mhcII.csv")
-c <- c %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class II")
-d <- read.csv("data/tcrsharingprob_TST_D7_beta_full-repertoires_mhcI.csv")
-d <- d %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class I")
+# number of published sequences
+ref <- read.csv("data/TableS2.csv") %>%
+  filter(chain == "beta")
+CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
+CMV <- format(c(CMV),big.mark=",", trim=TRUE)
+EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
+EBV <- format(c(EBV),big.mark=",", trim=TRUE)
+Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
+Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
 
-csc <- c %>% full_join(d)
+summary <- rbind(a,b) %>%
+  mutate(tissue = recode(tissue,
+                         TST_D2 = "Day 2 TST",
+                         TST_D7 = "Day 7 TST"),
+         Antigen = recode(Antigen,
+                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
+                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
+                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
 
-# combine data
-dat <- full_join(hla,csc)
-
-# regression coefficient + 95% CI
-reg1 <- dat %>%
-  filter(mhc == "MHC class II") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff1 <- reg1$coefficients[2]
-ci1 <- confint(reg1, 'HLA.dist', level=0.95)
-
-reg2 <- dat %>%
-  filter(mhc == "MHC class I") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff2 <- reg2$coefficients[2]
-ci2 <- confint(reg2, 'HLA.dist', level=0.95)
-
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4H_regression-analysis_beta_full-repertoires.csv",row.names = F)
+# stats
+stats <- summary %>%
+  group_by(Antigen,Clone.Size) %>%
+  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
 
 # plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
-  geom_jitter(aes(alpha = 0.5)) +
-  geom_smooth(method = "lm")+
-  scale_y_log10(limits = c(1e-8,2e-5))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
-  facet_wrap(~mhc,scales = "free_x")+
-  labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+ggplot(summary, aes(x=tissue,y=pct))+
+  geom_boxplot(colour="blue")+
+  facet_grid(Clone.Size~Antigen)+
+  scale_y_log10(limits = c(0.016,100))+
+  labs(x="Sample",
+       y="% of all CDR3s (down-sampled)") +
   My_Theme+
-  theme(legend.position="none")
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(20),log10(40),log10(80)))
 
+# Figure S3C: full repertoires, alpha ####
+a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_alpha.csv")
+b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_alpha.csv")
 
-## alpha, full repertoires
-# HLA overlap
-a <- read.csv("data/hladist_TST_D7_alpha_full-repertoires_mhcII.csv")
-a <- a %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class II")
-b <- read.csv("data/hladist_TST_D7_alpha_full-repertoires_mhcI.csv")
-b <- b %>%
-  rename("HLA.dist" = X0) %>%
-  mutate(mhc = "MHC class I")
-hla <- a %>% full_join(b)
+a <- a %>% mutate(Clone.Size = "All CDR3s")
+b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
 
-# coincidence
-c <- read.csv("data/tcrsharingprob_TST_D7_alpha_full-repertoires_mhcII.csv")
-c <- c %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class II")
-d <- read.csv("data/tcrsharingprob_TST_D7_alpha_full-repertoires_mhcI.csv")
-d <- d %>%
-  rename("sharing.prob" = X0) %>%
-  mutate(mhc = "MHC class I")
+# number of published sequences
+ref <- read.csv("data/TableS2.csv") %>%
+  filter(chain == "alpha")
+CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
+CMV <- format(c(CMV),big.mark=",", trim=TRUE)
+EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
+EBV <- format(c(EBV),big.mark=",", trim=TRUE)
+Mtb <- length(ref %>% filter(reactivity == "Mtb") %>% pull(CDR3) %>% unique())
+Mtb <- format(c(Mtb),big.mark=",", trim=TRUE)
 
-csc <- c %>% full_join(d)
+summary <- rbind(a,b) %>%
+  mutate(tissue = recode(tissue,
+                         TST_D2 = "Day 2 TST",
+                         TST_D7 = "Day 7 TST"),
+         Antigen = recode(Antigen,
+                          CMV = paste0("CMV\n(",CMV," CDR3s)"),
+                          EBV = paste0("EBV\n(",EBV," CDR3s)"),
+                          Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
 
-# combine data
-dat <- full_join(hla,csc)
-
-# regression coefficient + 95% CI
-reg1 <- dat %>%
-  filter(mhc == "MHC class II") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff1 <- reg1$coefficients[2]
-ci1 <- confint(reg1, 'HLA.dist', level=0.95)
-
-reg2 <- dat %>%
-  filter(mhc == "MHC class I") %>%
-  lm(sharing.prob~HLA.dist, data=.)
-coeff2 <- reg2$coefficients[2]
-ci2 <- confint(reg2, 'HLA.dist', level=0.95)
-
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4I_regression-analysis_alpha_full-repertoires.csv",row.names = F)
+# stats
+stats <- summary %>%
+  group_by(Antigen,Clone.Size) %>%
+  pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
 
 # plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
-  geom_jitter(aes(alpha = 0.5)) +
-  geom_smooth(method = "lm")+
-  scale_y_log10(limits = c(2e-7,2e-4))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
-  facet_wrap(~mhc,scales = "free_x")+
-  labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+ggplot(summary, aes(x=tissue,y=pct))+
+  geom_boxplot(colour="red")+
+  facet_grid(Clone.Size~Antigen)+
+  scale_y_log10()+
+  labs(x="Sample",
+       y="% of all CDR3s (down-sampled)") +
   My_Theme+
-  theme(legend.position="none")
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
+  expand_limits(y=130)+
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(45),log10(70),log10(110)))
