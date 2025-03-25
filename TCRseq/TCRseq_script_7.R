@@ -18,15 +18,9 @@ for (f in c(0:4)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
   dat.a <- alpha %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+    filter(duplicate_count >f)
   dat.b <- beta %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+    filter(duplicate_count >f)
   
   # make empty results data frame
   results <- data.frame()
@@ -97,15 +91,9 @@ for (f in c(0:4)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
   dat.a <- alpha %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+    filter(duplicate_count >f)
   dat.b <- beta %>%
-    group_by(sample,junction_aa) %>%
-    mutate(cdr3_count = sum(duplicate_count)) %>%
-    filter(cdr3_count >f) %>%
-    ungroup()
+    filter(duplicate_count >f)
   
   # make empty results data frame
   results <- data.frame()
@@ -164,4 +152,3 @@ for (f in c(0:4)) {
   }
   write.csv(results,paste0("data/Summary_down-sampled_private-Ag-abundance_expanded_gr",f,".csv"),row.names = F)
 }
-

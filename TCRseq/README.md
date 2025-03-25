@@ -29,7 +29,7 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 **Notes:**
 * `TCRseq_script_4` and `TCRseq_script_5` were adapted from code by Dr Andreas Tiffeau-Mayer. Change `chain` and `mhc_class` in repeated runs of the `HLA dependence` chunk of these scripts to test separately MHC II and MHC I association of cross-donor convergence.
 * `TCRseq_script_8` was adapted from code by Prof Benny Chain. This script also produces **Figure S7A**.
-* `TCRseq_script_10` identifies the index of selected metaclones. Their cluster number can be looked up in Table S4. The associated adjacency graphs and sequence logos, identifiable by metaclone cluster number, can then be found in the output produced by `Script_5` from the metaclone directory of this repository, and are displayed in **Figure 4F-G** and **Figure S7D-E**.
+* `TCRseq_script_10` identifies the index of selected metaclones. Their cluster number can be looked up in Table S4. The associated adjacency graphs and sequence logos, identifiable by metaclone cluster number, can then be found in the output produced by `Script_5` from the metaclone directory of this repository, and are displayed in **Figure 4D**.
 
 **To make main figures:**
 * **Figure 2A**: TCRseq_script_1 &rarr; TCRseq_script_2 &rarr; Plotting_script_Figure2A

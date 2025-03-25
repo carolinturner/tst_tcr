@@ -8,22 +8,16 @@ ref <- read.csv("data/TableS2.csv")
 
 # Step 1: full repertoires ####
 alpha <- fread("data/combined_alpha.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7")) %>%
-  group_by(sample,junction_aa) %>%
-  mutate(cdr3_count = sum(duplicate_count)) %>%
-  ungroup()
+  filter(tissue %in% c("Blood","TST_D2","TST_D7"))
 beta <- fread("data/combined_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood", "TST_D2", "TST_D7")) %>%
-  group_by(sample,junction_aa) %>%
-  mutate(cdr3_count = sum(duplicate_count)) %>%
-  ungroup()
+  filter(tissue %in% c("Blood", "TST_D2", "TST_D7")) 
 
 # loop through different expansion thresholds and quantify published CDR3s
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
-  dat.a <- alpha %>% filter(cdr3_count >f)
-  dat.b <- beta %>% filter(cdr3_count >f)
+  dat.a <- alpha %>% filter(duplicate_count >f)
+  dat.b <- beta %>% filter(duplicate_count >f)
   
   for (Chain in c("alpha","beta")){
     print(paste0("Chain: ",Chain))
@@ -88,22 +82,16 @@ for (f in c(0:1)) {
 
 # Step2: down-sampled repertoires ####
 alpha <- fread("data/combined_subsampled_alpha.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7")) %>%
-  group_by(sample,junction_aa) %>%
-  mutate(cdr3_count = sum(duplicate_count)) %>%
-  ungroup()
+  filter(tissue %in% c("Blood","TST_D2","TST_D7")) 
 beta <- fread("data/combined_subsampled_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood", "TST_D2", "TST_D7")) %>%
-  group_by(sample,junction_aa) %>%
-  mutate(cdr3_count = sum(duplicate_count)) %>%
-  ungroup()
+  filter(tissue %in% c("Blood", "TST_D2", "TST_D7"))
 
 # loop through different expansion thresholds and quantify published CDR3s
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
   # select TCRs
-  dat.a <- alpha %>% filter(cdr3_count >f)
-  dat.b <- beta %>% filter(cdr3_count >f)
+  dat.a <- alpha %>% filter(duplicate_count >f)
+  dat.b <- beta %>% filter(duplicate_count >f)
   
   for (Chain in c("alpha","beta")){
     print(paste0("Chain: ",Chain))

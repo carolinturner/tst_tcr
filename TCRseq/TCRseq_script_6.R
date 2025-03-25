@@ -95,7 +95,7 @@ for (chain in c("alpha","beta")){
   nil <- nil %>% pull(CDR3) %>% unique()
   ppd <- ppd %>% pull(CDR3) %>% unique()
   tt <- tt %>% pull(CDR3) %>% unique()
-  # clean ppd- and tt-reactive CDR3s
+  # clean ppd- and tt-reactive CDR3s by removing CDR3s that also expand in unstimulated cultures
   tt.clean <- setdiff(tt,nil)
   ppd.clean <- setdiff(ppd,nil)
   # save to file

@@ -24,8 +24,8 @@ My_Theme = theme(
 a <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr0_beta.csv")
 b <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr1_beta.csv")
 
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
+a <- a %>% mutate(Clone.Size = "All TCRs")
+b <- b %>% mutate(Clone.Size = "Expanded TCRs")
 
 # number of published sequences
 ref <- read.csv("data/TableS2.csv") %>%
@@ -46,6 +46,10 @@ summary <- rbind(a,b) %>%
                           EBV = paste0("EBV\n(",EBV," CDR3s)"),
                           Mtb = paste0("Mtb\n(",Mtb," CDR3s)")))
 
+summary$Antigen <- factor(summary$Antigen,
+                          levels = c(paste0("Mtb\n(",Mtb," CDR3s)"),
+                                     paste0("CMV\n(",CMV," CDR3s)"),
+                                     paste0("EBV\n(",EBV," CDR3s)")))
 # stats
 stats <- summary %>%
   group_by(Antigen,Clone.Size) %>%
@@ -60,4 +64,4 @@ ggplot(summary, aes(x=tissue,y=pct))+
        y="% of all CDR3s (down-sampled)") +
   My_Theme+
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))+
-  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(20),log10(40),log10(80)))
+  stat_pvalue_manual(stats, label = "p.adj.signif",y.position = c(log10(10),log10(30),log10(80)))

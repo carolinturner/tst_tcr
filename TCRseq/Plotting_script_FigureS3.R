@@ -23,19 +23,20 @@ My_Theme = theme(
   legend.position = "right", legend.justification = "top"
 )
 
-# Figure S2A: down-sampled, alpha ####
-d <- read.csv("data/Hill-diversity_TCR_down-sampled_alpha.csv")
+# Figure S3A: down-sampled, alpha ####
+d <- read.csv("data/Diversity_down-sampled_alpha.csv")
 
 dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
                          TST_D7 = "Day 7 TST")) %>%
-  select(richness,shannons,invsimpson,sum_expanded,tissue)
+  select(richness,gini,shannon,invsimpson,sum_expanded,tissue)
 
 # scaled data
 zdat <- dat %>%
   mutate(richness = c(scale(richness,scale = T, center = T)),
-         shannons = c(scale(shannons, scale = T, center = T)),
+         gini = c(scale(gini, scale = T, center = T)),
+         shannon = c(scale(shannon, scale = T, center = T)),
          invsimpson = c(scale(invsimpson, scale = T, center = T)),
          sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
   ungroup()
@@ -46,17 +47,18 @@ zdat.long <- zdat %>%
                names_to = "Metric",
                values_to = "Value") %>%
   mutate(Metric = recode(Metric,
-                         richness = "Richness (D_0)",
-                         shannons = "Shannon-Hill (D_1)",
-                         invsimpson = "Simpson-Hill (D_2)",
+                         richness = "Richness",
+                         gini = "Gini index",
+                         shannon = "Shannon diversity",
+                         invsimpson = "Simpson diversity",
                          sum_expanded = "No. expanded TCRs"))
 
 zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
   "No. expanded TCRs",
-  "Richness (D_0)",
-  "Shannon-Hill (D_1)",
-  "Simpson-Hill (D_2)"
-))
+  "Gini index",
+  "Richness",
+  "Shannon diversity",
+  "Simpson diversity"))
 
 # stats
 stats <- zdat.long %>%
@@ -65,27 +67,29 @@ stats <- zdat.long %>%
 
 # plot (save as svg 1000x350)
 ggplot(zdat.long,aes(tissue,Value))+
-  geom_boxplot(colour="red")+
+  geom_boxplot(colour="red",outliers = F)+
   facet_wrap(~Metric,ncol=5)+
   labs(x = "Sample", 
        y = "Z score")+
   My_Theme + 
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
-  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(3.5,4.5,5.5))
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(3.5,4,4.5)) +
+  ggtitle("alpha (down-sampled)")
 
-# Figure S2B: full repertoires, beta ####
-d <- read.csv("data/Hill-diversity_TCR_full-repertoires_beta.csv")
+# Figure S3B: full repertoires, beta ####
+d <- read.csv("data/Diversity_full-repertoires_beta.csv")
 
 dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
                          TST_D7 = "Day 7 TST")) %>%
-  select(richness,shannons,invsimpson,sum_expanded,tissue)
+  select(richness,gini,shannon,invsimpson,sum_expanded,tissue)
 
 # scaled data
 zdat <- dat %>%
   mutate(richness = c(scale(richness,scale = T, center = T)),
-         shannons = c(scale(shannons, scale = T, center = T)),
+         gini = c(scale(gini, scale = T, center = T)),
+         shannon = c(scale(shannon, scale = T, center = T)),
          invsimpson = c(scale(invsimpson, scale = T, center = T)),
          sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
   ungroup()
@@ -96,17 +100,18 @@ zdat.long <- zdat %>%
                names_to = "Metric",
                values_to = "Value") %>%
   mutate(Metric = recode(Metric,
-                         richness = "Richness (D_0)",
-                         shannons = "Shannon-Hill (D_1)",
-                         invsimpson = "Simpson-Hill (D_2)",
+                         richness = "Richness",
+                         gini = "Gini index",
+                         shannon = "Shannon diversity",
+                         invsimpson = "Simpson diversity",
                          sum_expanded = "No. expanded TCRs"))
 
 zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
   "No. expanded TCRs",
-  "Richness (D_0)",
-  "Shannon-Hill (D_1)",
-  "Simpson-Hill (D_2)"
-))
+  "Gini index",
+  "Richness",
+  "Shannon diversity",
+  "Simpson diversity"))
 
 # stats
 stats <- zdat.long %>%
@@ -115,27 +120,29 @@ stats <- zdat.long %>%
 
 # plot (save as svg 1000x350)
 ggplot(zdat.long,aes(tissue,Value))+
-  geom_boxplot(colour="blue")+
+  geom_boxplot(colour="blue",outliers = F)+
   facet_wrap(~Metric,ncol=5)+
   labs(x = "Sample", 
        y = "Z score")+
   My_Theme + 
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
-  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7))
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7)) +
+  ggtitle("beta (full repertoires)")
 
-# Figure S2C: full repertoires, alpha ####
-d <- read.csv("data/Hill-diversity_TCR_full-repertoires_alpha.csv")
+# Figure S3C: full repertoires, alpha ####
+d <- read.csv("data/Diversity_full-repertoires_alpha.csv")
 
 dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
                          TST_D7 = "Day 7 TST")) %>%
-  select(richness,shannons,invsimpson,sum_expanded,tissue)
+  select(richness,gini,shannon,invsimpson,sum_expanded,tissue)
 
 # scaled data
 zdat <- dat %>%
   mutate(richness = c(scale(richness,scale = T, center = T)),
-         shannons = c(scale(shannons, scale = T, center = T)),
+         gini = c(scale(gini, scale = T, center = T)),
+         shannon = c(scale(shannon, scale = T, center = T)),
          invsimpson = c(scale(invsimpson, scale = T, center = T)),
          sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
   ungroup()
@@ -146,17 +153,18 @@ zdat.long <- zdat %>%
                names_to = "Metric",
                values_to = "Value") %>%
   mutate(Metric = recode(Metric,
-                         richness = "Richness (D_0)",
-                         shannons = "Shannon-Hill (D_1)",
-                         invsimpson = "Simpson-Hill (D_2)",
+                         richness = "Richness",
+                         gini = "Gini index",
+                         shannon = "Shannon diversity",
+                         invsimpson = "Simpson diversity",
                          sum_expanded = "No. expanded TCRs"))
 
 zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
   "No. expanded TCRs",
-  "Richness (D_0)",
-  "Shannon-Hill (D_1)",
-  "Simpson-Hill (D_2)"
-))
+  "Gini index",
+  "Richness",
+  "Shannon diversity",
+  "Simpson diversity"))
 
 # stats
 stats <- zdat.long %>%
@@ -165,10 +173,11 @@ stats <- zdat.long %>%
 
 # plot (save as svg 1000x350)
 ggplot(zdat.long,aes(tissue,Value))+
-  geom_boxplot(colour="red")+
+  geom_boxplot(colour="red",outliers = F)+
   facet_wrap(~Metric,ncol=5)+
   labs(x = "Sample", 
        y = "Z score")+
   My_Theme + 
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0)) +
-  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7))
+  stat_pvalue_manual(stats, label = "p.adj.signif", y.position = c(5,6,7)) +
+  ggtitle("alpha (full repertoires)")

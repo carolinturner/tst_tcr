@@ -30,14 +30,14 @@ dat <- d %>%
   mutate(tissue = recode(tissue,
                          TST_D2 = "Day 2 TST",
                          TST_D7 = "Day 7 TST")) %>%
-  select(richness,ginis,shannons.bits,simpson,sum_expanded,tissue)
+  select(richness,gini,shannon,invsimpson,sum_expanded,tissue)
 
 # scaled data
 zdat <- dat %>%
   mutate(richness = c(scale(richness,scale = T, center = T)),
-         ginis = c(scale(ginis, scale = T, center = T)),
-         shannons.bits = c(scale(shannons.bits, scale = T, center = T)),
-         simpson = c(scale(log10(simpson), scale = T, center = T)),
+         gini = c(scale(gini, scale = T, center = T)),
+         shannon = c(scale(shannon, scale = T, center = T)),
+         invsimpson = c(scale(invsimpson, scale = T, center = T)),
          sum_expanded = c(scale(sum_expanded, scale = T, center = T))) %>%
   ungroup()
 
@@ -48,18 +48,17 @@ zdat.long <- zdat %>%
                values_to = "Value") %>%
   mutate(Metric = recode(Metric,
                          richness = "Richness",
-                         ginis = "Gini index",
-                         shannons.bits = "Shannon entropy",
-                         simpson = "Simpson index",
-                         sum_expanded = "Expanded CDR3s"))
+                         gini = "Gini index",
+                         shannon = "Shannon diversity",
+                         invsimpson = "Simpson diversity",
+                         sum_expanded = "No. expanded TCRs"))
 
 zdat.long$Metric <- factor(zdat.long$Metric, levels = c(
-  "Expanded CDR3s",
-  "Shannon entropy",
-  "Simpson index",
+  "No. expanded TCRs",
+  "Gini index",
   "Richness",
-  "Gini index"
-))
+  "Shannon diversity",
+  "Simpson diversity"))
 
 # stats
 stats <- zdat.long %>%
@@ -68,7 +67,7 @@ stats <- zdat.long %>%
 
 # plot (save as svg 1000x350)
 ggplot(zdat.long,aes(tissue,Value))+
-  geom_boxplot(colour="blue")+
+  geom_boxplot(colour="blue",outliers = F)+
   facet_wrap(~Metric,ncol=5)+
   labs(x = "Sample", 
        y = "Z score")+

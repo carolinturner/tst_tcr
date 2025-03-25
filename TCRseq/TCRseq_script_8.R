@@ -4,7 +4,6 @@
 library(data.table)
 library(tidyverse)
 library(mgcv)
-#library(textshape)
 
 # load meta data and extract UINs with paired TST samples
 meta <- read.csv("data/TCRseq_metadata.csv")
@@ -50,7 +49,7 @@ for (chain in c("alpha","beta")){
     
     ### Poisson distribution to identify expansion between D2 and D7 - adapted from Benny Chain
     
-    # replace missing clones with median count of the respective samples (usually =1)
+    # replace missing CDR3s with median count of the respective samples (usually =1)
     merge$count_D2[is.na(merge$count_D2)] <- median(D2$count_D2)
     merge$count_D7[is.na(merge$count_D7)] <- median(D7$count_D7)
     # add PPD reactivity
@@ -85,7 +84,7 @@ for (chain in c("alpha","beta")){
     # plot data
     png(paste0("data/Poisson_plot_",i,"_",chain,".png"),units="in", width=5, height=5,res=300)
     plot(log2$count_D2,log2$count_D7,xlim = c(2,16),ylim=c(2,16),
-         ylab="log2 TCRs/million (TST_D7)",xlab="log2 TCRs/million (TST_D2)",
+         ylab="log2 CDR3s/million (TST_D7)",xlab="log2 CDR3s/million (TST_D2)",
          col=factor(log2$PPD))
     # add the error limits as calculated above using Poisson distribution
     #lower limit
