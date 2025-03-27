@@ -1,8 +1,9 @@
 library(tidyverse)
+library(ggpubr)
 
 #My_Theme
-t = 10 #size of text
-m = 10 #size of margin around text
+t = 8 #size of text
+m = 4 #size of margin around text
 tc = "black" #colour of text
 My_Theme = theme(
   axis.title.x = element_text(size = t, face = "bold", margin = margin(t = m)),
@@ -16,77 +17,38 @@ My_Theme = theme(
   strip.text = element_text(size=t, face = "bold", colour = tc),
   strip.background = element_rect(fill = "gray90", colour = "black", linewidth = 0.5),
   panel.border = element_rect(fill = NA, linewidth = 0.5, colour = tc),
-  panel.background = element_rect(fill = "gray97")
-)
-
-# Figure S11A: down-sampled alpha ####
-a <- read.csv("data/Publicity_all-vs-published-vs-metaclone_down-sampled_alpha_expanded_gr0.csv")
-b <- read.csv("data/Publicity_all-vs-published-vs-metaclone_down-sampled_alpha_expanded_gr1.csv")
-
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
-
-summary <- rbind(a,b) %>% rename(TCR = "dataset") %>%
-  mutate(TCR = recode(TCR,
-                      "CDR3 with published Mtb reactivity" = "CDR3 (published Mtb reactivity)",
-                      "CDR3" = "CDR3 (D7 TST)"))
-
-# plot (save as svg 600x400)
-ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
-  geom_line() +
-  geom_point() +
-  scale_colour_manual(values=c("orange","darkred","navy")) +
-  facet_wrap(~Clone.Size)+
-  scale_x_log10()+
-  labs(x="number of TCRs (ranked by publicity)",
-       y="proportion of participants (cumulative)") +
-  My_Theme +
-  theme(legend.position = "top",legend.justification="left")
+  panel.background = element_rect(fill = "gray97"),
+  legend.position = "right", legend.justification = "top",
+  legend.margin = margin(0, 0, 0, 0),
+  legend.box.margin = margin(0,0,0,0),
+  legend.box.spacing = unit(c(0,0,0,0.1),"cm"),
+  panel.spacing.x = unit(0.05,"cm")
+  )
 
 
-# Figure S11B: full repertoires beta ####
+# full repertoires beta ####
 a <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_beta_expanded_gr0.csv")
 b <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_beta_expanded_gr1.csv")
 
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
+a <- a %>% mutate(Clone.Size = "All TCRs")
+b <- b %>% mutate(Clone.Size = "Expanded TCRs")
 
 summary <- rbind(a,b) %>% rename(TCR = "dataset") %>%
   mutate(TCR = recode(TCR,
                       "CDR3 with published Mtb reactivity" = "CDR3 (published Mtb reactivity)",
                       "CDR3" = "CDR3 (D7 TST)"))
 
-ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
+pS11 <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
   geom_line() +
   geom_point() +
   scale_colour_manual(values=c("orange","darkred","navy")) +
   facet_wrap(~Clone.Size)+
   scale_x_log10()+
   labs(x="number of TCRs (ranked by publicity)",
-       y="proportion of participants (cumulative)") +
+       y="proportion of participants \n(cumulative)") +
   My_Theme +
-  theme(legend.position = "top",legend.justification="left")
+  #theme(legend.position = "top",legend.justification="left") +
+  ggtitle("beta (full repertoire)")
 
-
-# Figure S11C: full repertoires alpha ####
-a <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_alpha_expanded_gr0.csv")
-b <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_alpha_expanded_gr1.csv")
-
-a <- a %>% mutate(Clone.Size = "All CDR3s")
-b <- b %>% mutate(Clone.Size = "Expanded CDR3s")
-
-summary <- rbind(a,b) %>% rename(TCR = "dataset") %>%
-  mutate(TCR = recode(TCR,
-                      "CDR3 with published Mtb reactivity" = "CDR3 (published Mtb reactivity)",
-                      "CDR3" = "CDR3 (D7 TST)"))
-
-ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
-  geom_line() +
-  geom_point() +
-  scale_colour_manual(values=c("orange","darkred","navy")) +
-  facet_wrap(~Clone.Size)+
-  scale_x_log10()+
-  labs(x="number of TCRs (ranked by publicity)",
-       y="proportion of participants (cumulative)") +
-  My_Theme +
-  theme(legend.position = "top",legend.justification="left")
+ggsave("FigureS11.svg", 
+       units = "cm", width = 12, height =6 , dpi=300)

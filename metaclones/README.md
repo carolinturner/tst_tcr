@@ -1,6 +1,6 @@
 # Scripts for metaclone discovery analyses
 
-The scripts provided here were adapted from code written by Dr Andreas Mayer-Tiffeau, and used for metaclone discovery analyses in the [TST TCR publication](link here once available), to identify metaclonotypist- and gliph2-derived T cell metaclones. The output of these scripts is required as input for some of the _TCRseq_scripts_ and _Plotting_scripts_ listed in the TCRseq directory of this GitHub repository. Relevant output tables are also summarised in Supplementary Tables S4-S9 of the [manuscript](link here once available).
+The scripts provided here were adapted from code written by Dr Andreas Mayer-Tiffeau, and used for metaclone discovery analyses in the [TST TCR publication](link here once available), to identify metaclonotypist- and gliph2-derived T cell metaclones. The output of these scripts is required as input for some of the _TCRseq_scripts_ and _Plotting_scripts_ listed in the TCRseq directory of this GitHub repository. Relevant output tables are also summarised in Supplementary Tables S4-S7 of the [manuscript](link here once available). 
 
 To run the code, processed TCRseq data and associated metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public). HLA imputations for participants are available as Table S3 of the [manuscript](link here once available). All source data should be saved in a subdirectory called `data`.
  
@@ -15,6 +15,7 @@ HLA data = Table S3 saved as `TableS3.csv`
 * `Script_5.ipynb`: Metaclonotypist analysis
 * `Script_6.ipynb`: Gliph2 analysis, followed by HLA association test as implemented in Metaclonotypist
 * `Script_7.R`: Add regex pattern to Gliph2 clusters
+* `Plotting_script_4CE.R`: Plot figure panels 4C and 4E
 
 **Notes:**
 * Down-sampling in `Script_2` has been done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis.
@@ -31,4 +32,4 @@ HLA data = Table S3 saved as `TableS3.csv`
 * Change `mhc_class` in repeated runs of `Script_7` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 
 **To make:**
-* **Figure 4C-E**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_Figure4C-E
+* **Figure 4C and 4E**: Script_1 &rarr; Script_2 &rarr; Script_3 and Snakefile &rarr; Script_5 &rarr; Plotting_script_Figure4CE

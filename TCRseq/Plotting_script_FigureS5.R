@@ -3,8 +3,8 @@ library(ggpubr)
 library(rstatix)
 
 #My_Theme
-t = 10 #size of text
-m = 10 #size of margin around text
+t = 8 #size of text
+m = 4 #size of margin around text
 tc = "black" #colour of text
 My_Theme = theme(
   axis.title.x = element_text(size = t, face = "bold", margin = margin(t = m)),
@@ -18,10 +18,16 @@ My_Theme = theme(
   strip.text = element_text(size=t, face = "bold", colour = tc),
   strip.background = element_rect(fill = "gray90", colour = "black", linewidth = 0.5),
   panel.border = element_rect(fill = NA, linewidth = 0.5, colour = tc),
-  panel.background = element_rect(fill = "gray97")
+  panel.background = element_rect(fill = "gray97"),
+  legend.position = "right", legend.justification = "top",
+  legend.margin = margin(0, 0, 0, 0),
+  legend.box.margin = margin(0,0,0,0),
+  legend.box.spacing = unit(c(0,0,0,0.1),"cm"),
+  plot.margin = unit(c(0.5,0.25,0,0.2),"cm"),
+  panel.spacing.x = unit(0.05,"cm")
 )
 
-# Figure S4A-C: within sample coincidence ####
+# Figure S5A-C: within sample coincidence ####
 
 ## alpha, down-sampled
 wsc <- read.csv("data/pc_withindonor_alpha_down-sampled.csv")
@@ -34,17 +40,18 @@ stats <- wsc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
+# plot
+pS5A <- ggplot(wsc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "red") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
+       y = "Within donor co-incidence")+ 
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 ## beta, full repertoires
 wsc <- read.csv("data/pc_withindonor_beta_full-repertoires.csv")
@@ -57,17 +64,18 @@ stats <- wsc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
+# plot
+pS5B <- ggplot(wsc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "blue") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
+       y = "Within donor co-incidence")+
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 
 ## alpha, full repertoires
@@ -81,20 +89,21 @@ stats <- wsc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(wsc, aes(x=tissue, y=logpc))+
+# plot
+pS5C <- ggplot(wsc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "red") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Within donor") +
+       y = "Within donor co-incidence") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top")+
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 
-# Figure S4D-F: cross-sample coincidence ####
+# Figure S5D-F: cross-sample coincidence ####
 
 ## alpha, down-sampled
 csc <- read.csv("data/pc_crossdonor_alpha_down-sampled.csv")
@@ -107,17 +116,18 @@ stats <- csc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
+# plot
+pS5D <- ggplot(csc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "red") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
+       y = "Between donor co-incidence") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 
 ## beta, full repertoires
@@ -131,17 +141,18 @@ stats <- csc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
+# plot
+pS5E <- ggplot(csc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "blue") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
+       y = "Between donor co-incidence") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 
 ## alpha, full repertoires
@@ -155,20 +166,21 @@ stats <- csc %>%
   pairwise_wilcox_test(data = ., logpc~tissue, p.adjust.method = "fdr") %>%
   add_xy_position() 
 
-# plot (save as svg 300x350)
-ggplot(csc, aes(x=tissue, y=logpc))+
+# plot
+pS5F <- ggplot(csc, aes(x=tissue, y=logpc))+
   geom_boxplot(colour = "red") +
   My_Theme+
   labs(x = "Sample", 
-       y = "TCR sharing probability") +
-  ggtitle("Cross-donor") +
+       y = "Between donor co-incidence") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        legend.position = "right", legend.justification = "top") +
-  stat_pvalue_manual(stats, label = "p.adj.signif")+
-  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0))
+        legend.position = "right", legend.justification = "top",
+        axis.title.x = element_blank())+
+  stat_pvalue_manual(stats, label = "p.adj.signif", size = 2)+
+  scale_y_continuous(labels = \(x) formatC(10^x,format="e", digits =0),
+                     expand = expansion(mult = c(0.05, 0.15)))
 
 
-# Figure S4G-I: TST_D7 cross-sample coincidence stratified by HLA overlap ####
+# Figure S5G-I: TST_D7 cross-sample coincidence stratified by HLA overlap ####
 
 ## alpha, down-sampled
 # HLA overlap
@@ -199,39 +211,25 @@ dat <- full_join(hla,csc)
 
 # regression coefficient + 95% CI
 reg1 <- dat %>%
-  filter(mhc == "MHC class II") %>%
+  filter(mhc == "MHC class I") %>%
   lm(sharing.prob~HLA.dist, data=.)
 coeff1 <- reg1$coefficients[2]
 ci1 <- confint(reg1, 'HLA.dist', level=0.95)
 
 reg2 <- dat %>%
-  filter(mhc == "MHC class I") %>%
+  filter(mhc == "MHC class II") %>%
   lm(sharing.prob~HLA.dist, data=.)
 coeff2 <- reg2$coefficients[2]
 ci2 <- confint(reg2, 'HLA.dist', level=0.95)
 
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4G_regression-analysis_alpha_down-sampled.csv",row.names = F)
-
-# plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
+# plot
+pS5G <- ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
   geom_jitter(aes(alpha = 0.5)) +
   geom_smooth(method = "lm")+
   scale_y_log10(limits = c(7e-7,3e-5))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
   facet_wrap(~mhc,scales = "free_x")+
   labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+       y = "Between donor co-incidence")+
   My_Theme+
   theme(legend.position="none")
 
@@ -276,28 +274,14 @@ reg2 <- dat %>%
 coeff2 <- reg2$coefficients[2]
 ci2 <- confint(reg2, 'HLA.dist', level=0.95)
 
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4H_regression-analysis_beta_full-repertoires.csv",row.names = F)
-
-# plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
+# plot
+pS5H <- ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
   geom_jitter(aes(alpha = 0.5)) +
   geom_smooth(method = "lm")+
   scale_y_log10(limits = c(1e-8,2e-5))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
   facet_wrap(~mhc,scales = "free_x")+
   labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+       y = "Between donor co-incidence")+
   My_Theme+
   theme(legend.position="none")
 
@@ -342,27 +326,23 @@ reg2 <- dat %>%
 coeff2 <- reg2$coefficients[2]
 ci2 <- confint(reg2, 'HLA.dist', level=0.95)
 
-# summary
-reg <- as.data.frame(rbind(ci2,ci1))
-rownames(reg) <- NULL
-reg$mhc <- c("MHC class I","MHC class II")
-reg$beta <- c(coeff2,coeff1)
-reg$beta <- formatC(reg$beta, format = "e", digits = 2)
-reg$`2.5 %`<- formatC(reg$`2.5 %`,format='e', digits=2)
-reg$`97.5 %`<- formatC(reg$`97.5 %`,format = 'e', digits=2)
-reg <- reg %>%
-  mutate("95% CI" = paste0("(",`2.5 %`," - ",`97.5 %`,")")) %>%
-  select(mhc,beta,'95% CI')
-write.csv(reg,"data/FigureS4I_regression-analysis_alpha_full-repertoires.csv",row.names = F)
-
-# plot (save as svg 600x500)
-ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
+# plot
+pS5I <- ggplot(dat,aes(x=HLA.dist,y=sharing.prob)) +
   geom_jitter(aes(alpha = 0.5)) +
   geom_smooth(method = "lm")+
   scale_y_log10(limits = c(2e-7,2e-4))+
-  scale_x_continuous(breaks = seq(min(dat$HLA.dist), max(dat$HLA.dist), by = 1))+
   facet_wrap(~mhc,scales = "free_x")+
   labs(x = "HLA overlap", 
-       y = "TCR sharing probability (cross-donor)")+
+       y = "Between donor co-incidence")+
   My_Theme+
   theme(legend.position="none")
+
+# assemble figure ####
+ggarrange(pS5A,pS5B,pS5C,pS5D,pS5E,pS5F,pS5G,pS5H,pS5I,
+          nrow=3,
+          ncol=3,
+          labels = list("A","B","C","D","E","F","G","H","I"),
+          font.label = list(size = 10, face = "bold", colour = "black"))
+ggsave("FigureS5.svg", 
+       units = "cm", width = 17, height =17 , dpi=300)
+

@@ -1,13 +1,15 @@
 library(tidyverse)
+library(ggplotify)
 library(pheatmap)
+library(ggpubr)
 
 #My_Theme
-t = 10 #size of text
-m = 10 #size of margin around text
+t = 8 #size of text
+m = 4 #size of margin around text
 tc = "black" #colour of text
 My_Theme = theme(
   axis.title.x = element_text(size = t, face = "bold", margin = margin(t = m)),
-  axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = 0, hjust = 0),
+  axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = 0, hjust = 0.5),
   axis.title.y.left = element_text(size = t, face = "bold", margin = margin(r = m)),
   axis.title.y.right = element_text(size = t, face = "bold", margin = margin(l = m)),
   axis.text.y = element_text(size = t, face = "bold", colour = tc),
@@ -18,15 +20,20 @@ My_Theme = theme(
   strip.background = element_rect(fill = "gray90", colour = "black", linewidth = 0.5),
   panel.border = element_rect(fill = NA, linewidth = 0.5, colour = tc),
   panel.background = element_rect(fill = "gray97"),
-  legend.position = "right", legend.justification = "top"
+  legend.position = "right", legend.justification = "top",
+  legend.margin = margin(0, 0, 0, 0),
+  legend.box.margin = margin(0,0,0,0),
+  legend.box.spacing = unit(c(0,0,0,0.1),"cm"),
+  panel.spacing.x = unit(0.05,"cm"),
+  plot.margin = unit(c(0.5,0.6,0,0.2),"cm")
 )
 
 # Figure 3A ####
-dat <- read.csv("data/Publicness_in-vitro_PPD.csv",row.names = 1)
-dat.b <- dat %>% select(-alpha)
+dat.b <- read.csv("data/Publicness_in-vitro_PPD.csv",row.names = 1) %>%
+  select(-alpha)
 
-# plot (save as svg 350x300)
-ggplot(dat.b, aes(x=publicness,y=beta))+
+# plot 
+p3A <- ggplot(dat.b, aes(x=publicness,y=beta))+
   geom_bar(stat = "identity",fill="blue",colour="blue",width=0.8)+
   scale_x_continuous(n.breaks = 11, limits = c(0.6,12))+
   scale_y_log10()+
@@ -38,8 +45,8 @@ ggplot(dat.b, aes(x=publicness,y=beta))+
 dat <- read.csv("data/Heatmap_data_beta.csv",row.names = 1)
 
 # plot
-png("Figure3B.png",width=1808,height=1617,res=600)
-pheatmap(dat,
+hm <- as.ggplot(
+  pheatmap(dat,
          fontsize = 10,
          color=colorRampPalette(c("grey90", "blue"))(2),
          legend = F,
@@ -50,8 +57,10 @@ pheatmap(dat,
          show_rownames = F,
          show_colnames = F,
          treeheight_row = 20,
-         treeheight_col = 20)
-dev.off()
+         treeheight_col = 20))
+p3B <- ggarrange(hm) %>%
+  annotate_figure(bottom = text_grob("Participants", size = 8, face = "bold"),
+                  left = text_grob("CDR3 sequences", size = 8, face = "bold", rot = 90))
 
 # Figure 3C-D ####
 a <- read.csv("data/Summary_down-sampled_private-Ag-abundance_expanded_gr0.csv")
@@ -79,24 +88,40 @@ summary <- rbind(a,b,c,d,e) %>%
 # beta chain data
 beta <- summary %>% filter(chain == "beta")
 
-# Figure 3C: all CDR3s (save as svg 800x400)
-ggplot(beta, aes(x=tissue,y=pct))+
+# Figure 3C: all CDR3s
+p3C <- ggplot(beta, aes(x=tissue,y=pct))+
   geom_boxplot(colour="blue")+
   facet_grid(Antigen~Clone.Size)+
   ylim(0,100)+
   labs(x="Sample",
        y="% of all CDR3s (down-sampled)") +
   My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
+        axis.title.x = element_blank())
 
-
-# Figure 3D: unique CDR3s (save as svg 800x400)
-ggplot(beta, aes(x=tissue,y=pct.unique))+
+# Figure 3D: unique CDR3s
+p3D <- ggplot(beta, aes(x=tissue,y=pct.unique))+
   geom_boxplot(colour="blue")+
   facet_grid(Antigen~Clone.Size)+
   ylim(0,100)+
   labs(x="Sample",
        y="% of unique CDR3s (down-sampled)") +
   My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))
+  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
+        axis.title.x = element_blank())
 
+# assemble figure ####
+r1 <- ggarrange(p3A,p3B,
+                ncol=3,
+                widths = c(1.3,1,0.7),
+                labels = list("A","B"),
+                font.label = list(size = 10, face = "bold", colour = "black"))
+r2 <- ggarrange(p3C,p3D,
+                nrow = 2,
+                labels = list("C","D"),
+                font.label = list(size = 10, face = "bold", colour = "black"))
+ggarrange(r1,r2,
+          nrow = 2,
+          heights = c(0.7,2))
+ggsave("Figure3.png", # svg file too large to import to Word 
+       units = "cm", width = 17, height =20 , dpi=300)

@@ -19,7 +19,7 @@ for (i in id){
   write.table(ppd.new,paste0("data/",i,"_beta_PPD_gr3_cleaned.csv"), sep = ",", row.names = F, col.names = F)
 }
 
-### Step 2: down-sampled repertoires
+### Step 2: down-sampled repertoires ####
 ### Step 2a: quantify metaclones in blood and TST samples (participants with in vitro data) ####
 data.b <- fread("data/combined_subsampled_beta.csv.gz") %>%
   filter(UIN %in% id & tissue %in% c("Blood","TST_D2","TST_D7"))
@@ -74,51 +74,33 @@ for (f in c(0:4)){
   for (i in unique(dat$sample)){
     uin <- str_split(i,pattern="_")[[1]][1]
     # select repertoire and calculate total TCR count
-    d <- dat %>%
-      filter(sample == i & duplicate_count > f)
+    d <- dat %>% filter(sample == i & duplicate_count > f)
     total <- sum(d$duplicate_count)
     # load private ppd reactive sequences
     ppd <- read.csv(paste0("data/",uin,"_beta_PPD_gr3_cleaned.csv"),header=F) %>% pull(V1)
-    # quantify % of all private cdr3s
-    ppd.d7 <- d %>% filter(junction_aa %in% ppd)
-    sum.ppd <- sum(ppd.d7$duplicate_count)
+    # quantify %TCRs matching private cdr3s
+    ppd.tst <- d %>% filter(junction_aa %in% ppd)
+    sum.ppd <- sum(ppd.tst$duplicate_count)
     pct.ppd <- sum.ppd/total*100
     # load metaclone CDR3s
     mc.res <- read.csv(paste0("data/metaclonotypist_results_down-sampled_beta_expanded_gr",f,"_n=12.csv")) %>%
       filter(sample == i)
-    mc <- mc.res %>%
-      pull(junction_aa) %>%
-      unique()
-    sum.mc <- mc.res %>%
-      summarise(sum.mc = sum(duplicate_count)) %>%
-      pull(sum.mc)
+    # quantify %TCRs matching metaclones
+    sum.mc <- sum(mc.res$duplicate_count)
     pct.mc <- sum.mc/total*100
-    # overlap in vitro and mc
-    ppd.mc <- intersect(ppd.d7$junction_aa,mc)
-    overlap <- d %>% filter(junction_aa %in% ppd.mc)
-    sum.overlap <- sum(overlap$duplicate_count)
-    pct.overlap <- sum.overlap/total*100
     # only private
-    ppd.only <- setdiff(ppd.d7$junction_aa,overlap$junction_aa)
+    ppd.only <- setdiff(ppd.tst$junction_aa,mc.res$junction_aa)
     dat.ppd.only <- d %>% filter(junction_aa %in% ppd.only)
     sum.ppd.only <- sum(dat.ppd.only$duplicate_count)
     pct.ppd.only <- sum.ppd.only/total*100
-    # only mc
-    mc.only <- setdiff(mc,overlap$junction_aa)
-    dat.mc.only <- mc.res %>% filter(junction_aa %in% mc.only)
-    sum.mc.only <- dat.mc.only %>%
-      summarise(sum = sum(duplicate_count)) %>%
-      pull(sum)
-    pct.mc.only <- sum.mc.only/total*100
     # add to summary
-    res <- c(i,uin,total,sum.ppd,pct.ppd,sum.mc,pct.mc,sum.overlap,pct.overlap,sum.ppd.only,pct.ppd.only,sum.mc.only,pct.mc.only)
+    res <- c(i,uin,total,sum.mc,pct.mc,sum.ppd.only,pct.ppd.only)
     summary.ppd <- rbind(summary.ppd,res)
   }
+  colnames(summary.ppd) <- c("Sample","UIN","total.CDR3s","number.mc","pct.mc","number.PPD.only","pct.PPD.only")
+  summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")] <- sapply(summary.ppd[c("total.CDR3s","number.mc","pct.mc","number.PPD.only","pct.PPD.only")],as.numeric)
+  write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D2_down-sampled_expanded_gr",f,".csv"),row.names = F)
 }
-colnames(summary.ppd) <- c("Sample","UIN","total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")
-summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")] <- sapply(summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")],as.numeric)
-write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D2_down-sampled_expanded_gr",f,".csv"),row.names = F)
-
 
 ### Step 2c: metaclones vs. private PPD-CDR3s in Day 7 TST ####
 spl <- meta %>% filter(UIN %in% id & tissue == "TST_D7") %>% pull(sample)
@@ -132,51 +114,34 @@ for (f in c(0:4)){
   # loop through each sample
   for (i in unique(dat$sample)){
     uin <- str_split(i,pattern="_")[[1]][1]
-    # select repertoire and calculate total CDR3s
-    d <- dat %>% filter(sample == i) %>%
-      group_by(junction_aa) %>%
-      summarise(cdr3_count = sum(duplicate_count)) %>%
-      filter(cdr3_count > f) %>%
-      ungroup()
-    total <- sum(d$cdr3_count)
+    # select repertoire and calculate total TCR count
+    d <- dat %>% filter(sample == i & duplicate_count > f)
+    total <- sum(d$duplicate_count)
     # load private ppd reactive sequences
     ppd <- read.csv(paste0("data/",uin,"_beta_PPD_gr3_cleaned.csv"),header=F) %>% pull(V1)
     # quantify % of all private cdr3s
-    ppd.d7 <- d %>% filter(junction_aa %in% ppd)
-    sum.ppd <- sum(ppd.d7$cdr3_count)
+    ppd.tst <- d %>% filter(junction_aa %in% ppd)
+    sum.ppd <- sum(ppd.tst$cdr3_count)
     pct.ppd <- sum.ppd/total*100
     # load metaclone CDR3s
     mc.res <- read.csv(paste0("data/metaclonotypist_results_down-sampled_beta_expanded_gr",f,"_n=12.csv")) %>%
       filter(sample == i)
-    mc <- mc.res %>% pull(junction_aa) %>% unique()
-    sum.mc <- mc.res %>% summarise(sum.mc = sum(duplicate_count)) %>%
-      pull(sum.mc)
+    # quantify %TCRs matching metaclones
+    sum.mc <- sum(mc.res$duplicate_count)
     pct.mc <- sum.mc/total*100
-    # overlap in vitro and mc
-    ppd.mc <- intersect(ppd.d7$junction_aa,mc)
-    overlap <- d %>% filter(junction_aa %in% ppd.mc)
-    sum.overlap <- sum(overlap$cdr3_count)
-    pct.overlap <- sum.overlap/total*100
     # only private
-    ppd.only <- setdiff(ppd.d7$junction_aa,overlap$junction_aa)
+    ppd.only <- setdiff(ppd.tst$junction_aa,mc.res$junction_aa)
     dat.ppd.only <- d %>% filter(junction_aa %in% ppd.only)
-    sum.ppd.only <- sum(dat.ppd.only$cdr3_count)
+    sum.ppd.only <- sum(dat.ppd.only$duplicate_count)
     pct.ppd.only <- sum.ppd.only/total*100
-    # only mc
-    mc.only <- setdiff(mc,overlap$junction_aa)
-    dat.mc.only <- mc.res %>% filter(junction_aa %in% mc.only)
-    sum.mc.only <- dat.mc.only %>% summarise(sum = sum(duplicate_count)) %>%
-      pull(sum)
-    pct.mc.only <- sum.mc.only/total*100
     # add to summary
-    res <- c(i,uin,total,sum.ppd,pct.ppd,sum.mc,pct.mc,sum.overlap,pct.overlap,sum.ppd.only,pct.ppd.only,sum.mc.only,pct.mc.only)
+    res <- c(i,uin,total,sum.mc,pct.mc,sum.ppd.only,pct.ppd.only)
     summary.ppd <- rbind(summary.ppd,res)
   }
+  colnames(summary.ppd) <- c("Sample","UIN","total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")
+  summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")] <- sapply(summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")],as.numeric)
+  write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D7_down-sampled_expanded_gr",f,".csv"),row.names = F)
 }
-colnames(summary.ppd) <- c("Sample","UIN","total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")
-summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")] <- sapply(summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")],as.numeric)
-write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D7_down-sampled_expanded_gr",f,".csv"),row.names = F)
-
 
 ### Step 3: full repertoires ####
 ### Step 3a: quantify metaclones in blood and TST samples (participants with in vitro data) ####
@@ -230,48 +195,34 @@ for (f in c(0:4)){
   # loop through each sample
   for (i in unique(dat$sample)){
     uin <- str_split(i,pattern="_")[[1]][1]
-    # select repertoire and calculate total TCR
-    d <- dat %>%
-      filter(sample == i & duplicate_count > f)
+    # select repertoire and calculate total TCRs
+    d <- dat %>% filter(sample == i & duplicate_count > f)
     total <- sum(d$duplicate_count)
     # load private ppd reactive sequences
     ppd <- read.csv(paste0("data/",uin,"_beta_PPD_gr3_cleaned.csv"),header=F) %>% pull(V1)
     # quantify % of all private cdr3s
-    ppd.d7 <- d %>% filter(junction_aa %in% ppd)
-    sum.ppd <- sum(ppd.d7$duplicate_count)
+    ppd.tst <- d %>% filter(junction_aa %in% ppd)
+    sum.ppd <- sum(ppd.tst$duplicate_count)
     pct.ppd <- sum.ppd/total*100
     # load metaclone CDR3s
     mc.res <- read.csv(paste0("data/metaclonotypist_results_full-repertoires_beta_expanded_gr",f,"_n=12.csv")) %>%
       filter(sample == i)
-    mc <- mc.res %>% pull(junction_aa) %>% unique()
-    sum.mc <- mc.res %>%
-      summarise(sum.mc = sum(duplicate_count)) %>%
-      pull(sum.mc)
+    # quantify %TCRs matching metaclones
+    sum.mc <- sum(mc.res$duplicate_count)
     pct.mc <- sum.mc/total*100
-    # overlap in vitro and mc
-    ppd.mc <- intersect(ppd.d7$junction_aa,mc)
-    overlap <- d %>% filter(junction_aa %in% ppd.mc)
-    sum.overlap <- sum(overlap$duplicate_count)
-    pct.overlap <- sum.overlap/total*100
     # only private
-    ppd.only <- setdiff(ppd.d7$junction_aa,overlap$junction_aa)
+    ppd.only <- setdiff(ppd.tst$junction_aa,mc.res$junction_aa)
     dat.ppd.only <- d %>% filter(junction_aa %in% ppd.only)
     sum.ppd.only <- sum(dat.ppd.only$duplicate_count)
     pct.ppd.only <- sum.ppd.only/total*100
-    # only mc
-    mc.only <- setdiff(mc,overlap$junction_aa)
-    dat.mc.only <- mc.res %>% filter(junction_aa %in% mc.only)
-    sum.mc.only <- dat.mc.only %>% summarise(sum = sum(duplicate_count)) %>%
-      pull(sum)
-    pct.mc.only <- sum.mc.only/total*100
     # add to summary
-    res <- c(i,uin,total,sum.ppd,pct.ppd,sum.mc,pct.mc,sum.overlap,pct.overlap,sum.ppd.only,pct.ppd.only,sum.mc.only,pct.mc.only)
+    res <- c(i,uin,total,sum.mc,pct.mc,sum.ppd.only,pct.ppd.only)
     summary.ppd <- rbind(summary.ppd,res)
   }
+  colnames(summary.ppd) <- c("Sample","UIN","total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")
+  summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")] <- sapply(summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")],as.numeric)
+  write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D2_full-repertoires_expanded_gr",f,".csv"),row.names = F)
 }
-colnames(summary.ppd) <- c("Sample","UIN","total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")
-summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")] <- sapply(summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")],as.numeric)
-write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D2_full-repertoires_expanded_gr",f,".csv"),row.names = F)
 
 ### Step 3c: metaclones vs. private PPD-CDR3s in Day 7 TST ####
 spl <- meta %>% filter(UIN %in% id & tissue == "TST_D7") %>% pull(sample)
@@ -285,43 +236,31 @@ for (f in c(0:4)){
   # loop through each sample
   for (i in unique(dat$sample)){
     uin <- str_split(i,pattern="_")[[1]][1]
-    # select repertoire and calculate total CDR3s
+    # select repertoire and calculate total TCRs
     d <- dat %>% filter(sample == i & duplicate_count > f)
     total <- sum(d$duplicate_count)
     # load private ppd reactive sequences
     ppd <- read.csv(paste0("data/",uin,"_beta_PPD_gr3_cleaned.csv"),header=F) %>% pull(V1)
     # quantify % of all private cdr3s
-    ppd.d7 <- d %>% filter(junction_aa %in% ppd)
-    sum.ppd <- sum(ppd.d7$duplicate_count)
+    ppd.tst <- d %>% filter(junction_aa %in% ppd)
+    sum.ppd <- sum(ppd.tst$duplicate_count)
     pct.ppd <- sum.ppd/total*100
     # load metaclone CDR3s
     mc.res <- read.csv(paste0("data/metaclonotypist_results_full-repertoires_beta_expanded_gr",f,"_n=12.csv")) %>%
       filter(sample == i)
-    mc <- mc.res %>% pull(junction_aa) %>% unique()
-    sum.mc <- mc.res %>% summarise(sum.mc = sum(duplicate_count)) %>%
-      pull(sum.mc)
+    # quantify %TCRs matching metaclones
+    sum.mc <- sum(mc.res$duplicate_count)
     pct.mc <- sum.mc/total*100
-    # overlap in vitro and mc
-    ppd.mc <- intersect(ppd.d7$junction_aa,mc)
-    overlap <- d %>% filter(junction_aa %in% ppd.mc)
-    sum.overlap <- sum(overlap$duplicate_count)
-    pct.overlap <- sum.overlap/total*100
     # only private
-    ppd.only <- setdiff(ppd.d7$junction_aa,overlap$junction_aa)
+    ppd.only <- setdiff(ppd.tst$junction_aa,mc.res$junction_aa)
     dat.ppd.only <- d %>% filter(junction_aa %in% ppd.only)
     sum.ppd.only <- sum(dat.ppd.only$duplicate_count)
     pct.ppd.only <- sum.ppd.only/total*100
-    # only mc
-    mc.only <- setdiff(mc,overlap$junction_aa)
-    dat.mc.only <- mc.res %>% filter(junction_aa %in% mc.only)
-    sum.mc.only <- dat.mc.only %>% summarise(sum = sum(duplicate_count)) %>%
-      pull(sum)
-    pct.mc.only <- sum.mc.only/total*100
-    # add tsum# add to summary
-    res <- c(i,uin,total,sum.ppd,pct.ppd,sum.mc,pct.mc,sum.overlap,pct.overlap,sum.ppd.only,pct.ppd.only,sum.mc.only,pct.mc.only)
+    # add to summary
+    res <- c(i,uin,total,sum.mc,pct.mc,sum.ppd.only,pct.ppd.only)
     summary.ppd <- rbind(summary.ppd,res)
   }
+  colnames(summary.ppd) <- c("Sample","UIN","total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")
+  summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")] <- sapply(summary.ppd[c("total.TCRs","number.mc","pct.mc","number.PPD.only","pct.PPD.only")],as.numeric)
+  write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D7_full-repertoires_expanded_gr",f,".csv"),row.names = F)
 }
-colnames(summary.ppd) <- c("Sample","UIN","total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")
-summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")] <- sapply(summary.ppd[c("total.CDR3s","number.PPD","pct.PPD","number.mc","pct.mc","number.overlap","pct.overlap","number.PPD.only","pct.PPD.only","number.mc.only","pct.mc.only")],as.numeric)
-write.csv(summary.ppd,paste0("data/invitro-vs-mc_results_D7_full-repertoires_expanded_gr",f,".csv"),row.names = F)

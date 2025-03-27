@@ -40,7 +40,7 @@ for (f in c(0:1)) {
   # write to file
   write.csv(summary,paste0("data/metaclonotypist_results_full-repertoires_beta_expanded_gr",f,".csv"),row.names = F)
   
-  # calculate percentage of metaclones amongst total CDR3s
+  # calculate percentage of metaclones amongst total TCRs
   dat <- dat %>%
     group_by(tissue,sample) %>%
     summarise(total.count = sum(duplicate_count)) %>%
@@ -95,7 +95,7 @@ for (f in c(0:1)) {
   # write to file
   write.csv(summary,paste0("data/metaclonotypist_results_down-sampled_beta_expanded_gr",f,".csv"),row.names = F)
   
-  # calculate percentage of metaclones amongst total CDR3s
+  # calculate percentage of metaclones amongst total TCRs
   dat <- dat %>%
     group_by(tissue,sample) %>%
     summarise(total.count = sum(duplicate_count)) %>%

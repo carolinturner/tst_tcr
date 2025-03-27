@@ -1,6 +1,6 @@
 # Scripts for TCRseq analyses
 
-The scripts provided here were used for TCRseq analyses in the [TST TCR publication](link here once available). `TCRseq_scripts` generate the data required for `Plotting_scripts` to make individual panels for Figures 2-5 and Supplementary Figures S3-S11 as detailed below. Figures were assembled in Inkscape.
+The scripts provided here were used for TCRseq analyses in the [TST TCR publication](link here once available). `TCRseq_scripts` generate the data required for `Plotting_scripts` to make Figures 2-5 and Supplementary Figures S3-S11 as detailed below. Figures 4 and S7 were assembled in Inkscape.
 
 **Input data:**
 * Processed TCRseq data and metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
@@ -32,14 +32,14 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 * `TCRseq_script_10` identifies the index of selected metaclones. Their cluster number can be looked up in Table S4. The associated adjacency graphs and sequence logos, identifiable by metaclone cluster number, can then be found in the output produced by `Script_5` from the metaclone directory of this repository, and are displayed in **Figure 4D**.
 
 **To make main figures:**
-* **Figure 2A**: TCRseq_script_1 &rarr; TCRseq_script_2 &rarr; Plotting_script_Figure2A
-* **Figure 2B**: TCRseq_script_1 &rarr; TCRseq_script_3 &rarr; Plotting_script_Figure2B
-* **Figure 2C-E**: TCRseq_script_1 &rarr; TCRseq_script_4 &rarr; Plotting_script_Figure2C-E
+* **Figure 2A**: TCRseq_script_1 &rarr; TCRseq_script_2 &rarr; Plotting_script_Figure2
+* **Figure 2B**: TCRseq_script_1 &rarr; TCRseq_script_3 &rarr; Plotting_script_Figure2
+* **Figure 2C-E**: TCRseq_script_1 &rarr; TCRseq_script_4 &rarr; Plotting_script_Figure2
 * **Figure 3**: TCRseq_script_1 &rarr; TCRseq_script_6 &rarr; TCRseq_script_7 &rarr; Plotting_script_Figure3
-* **Figure 5A**: TCRseq_script_1 &rarr; TCRseq_script_11 &rarr; Plotting_script_Figure5A
-* **Figure 5B**: TCRseq_script_1 &rarr; TCRseq_script_9 &rarr; Plotting_script_Figure5B 
-* **Figure 5C**: TCRseq_script_1 &rarr; TCRseq_script_6 and TCRseq_script_7 &rarr; TCRseq_script_13 &rarr; Plotting_script_Figure5C
-* **Figure 5D**: TCRseq_script_1 &rarr; TCRseq_script_3 and TCRseq_script_9 &rarr; TCRseq_script_14 &rarr; Plotting_script_Figure5D
+* **Figure 5A**: TCRseq_script_1 &rarr; TCRseq_script_11 &rarr; Plotting_script_Figure5
+* **Figure 5B**: TCRseq_script_1 &rarr; TCRseq_script_9 &rarr; Plotting_script_Figure5 
+* **Figure 5C**: TCRseq_script_1 &rarr; TCRseq_script_6 and TCRseq_script_7 &rarr; TCRseq_script_13 &rarr; Plotting_script_Figure5
+* **Figure 5D**: TCRseq_script_1 &rarr; TCRseq_script_3 and TCRseq_script_9 &rarr; TCRseq_script_14 &rarr; Plotting_script_Figure5
 
 **To make supplementary figures:**
 * **Figure S3**: TCRseq_script_1 &rarr; TCRseq_script_2 &rarr; Plotting_script_FigureS3

@@ -1,9 +1,10 @@
 library(tidyverse)
 library(ggh4x)
+library(ggpubr)
 
 #My_Theme
-t = 10 #size of text
-m = 10 #size of margin around text
+t = 8 #size of text
+m = 2 #size of margin around text
 tc = "black" #colour of text
 My_Theme = theme(
   axis.title.x = element_text(size = t, face = "bold", margin = margin(t = m)),
@@ -18,8 +19,11 @@ My_Theme = theme(
   strip.background = element_rect(fill = "gray90", colour = "black", linewidth = 0.5),
   panel.border = element_rect(fill = NA, linewidth = 0.5, colour = tc),
   panel.background = element_rect(fill = "gray97"),
-  plot.background = element_rect(fill='transparent', color=NA), #transparent plot bg
-  legend.position = "right", legend.justification = "top"
+  legend.position = "top", legend.justification = "left",
+  legend.margin = margin(0, 0, 0, 0),
+  legend.box.margin = margin(0,0,0,0),
+  legend.box.spacing = unit(c(0,0,0,0),"cm"),
+  plot.margin = unit(c(0,0.2,0,0),"cm")
 )
 
 # Figure 4C ####
@@ -46,78 +50,37 @@ b.long <- b %>%
                names_to = "Metric",
                values_to = "Value") %>%
   mutate(Metric = recode(Metric,
-                         nmetaclones = "# HLA-metaclones",
-                         sig_clonotype_fraction = "% TCRs",
-                         id_fraction = "% Participants"))
+                         nmetaclones = "Metaclones (N)",
+                         sig_clonotype_fraction = "TCRs (%)",
+                         id_fraction = "Participants (%)"))
 
 b.long$dataset <- factor(b.long$dataset, levels = c(
   "true",
   "shuffled"
 ))
 
-# plot (save as svg 610x250)
-ggplot(b.long,aes(max_tcrdist,Value,colour=dataset))+
+# plot
+p4C <- ggplot(b.long,aes(max_tcrdist,Value,colour=dataset))+
   geom_point()+
   geom_line()+
   scale_colour_manual(values=c("blue","orange"))+
   facet_wrap(~Metric,ncol=3,scales = "free_y")+
   labs(x = "TCRdist threshold",
-       y = "")+
+       y = "",
+       col = "dataset")+
   My_Theme 
-
-# Figure 4D ####
-# remove clusters with odds ratio = 0 as can't log10 transform
-# replace odds ratio = Inf with very big, numerical value to allow plotting
-d1 <- read.csv("output/metaclonotypist_beta_mhcII/clusterassociation_beta_mhcII.csv") %>%
-  filter(odds_ratio > 0) %>%
-  mutate(odds_ratio = replace(odds_ratio, odds_ratio == "Inf", 400),
-         log_p = -log10(pvalue),
-         dataset = "True data",
-         mhc = "MHC-II") %>%
-  select(odds_ratio,log_p,dataset,mhc,significant)
-d2 <- read.csv("output/metaclonotypist_beta_mhcI/clusterassociation_beta_mhcI.csv") %>%
-  filter(odds_ratio > 0) %>%
-  mutate(odds_ratio = replace(odds_ratio, odds_ratio == "Inf", 400),
-         log_p = -log10(pvalue),
-         dataset = "True data",
-         mhc = "MHC-I") %>%
-  select(odds_ratio,log_p,dataset,mhc,significant)
-d3 <- read.csv("output/metaclonotypist_beta_mhcII/clusterassociation_shuffled_beta_mhcII.csv") %>%
-  filter(odds_ratio > 0) %>%
-  mutate(odds_ratio = replace(odds_ratio, odds_ratio == "Inf", 400),
-         log_p = -log10(pvalue),
-         dataset = "Shuffled data",
-         mhc = "MHC-II") %>%
-  select(odds_ratio,log_p,dataset,mhc,significant)
-d4 <- read.csv("output/metaclonotypist_beta_mhcI/clusterassociation_shuffled_beta_mhcI.csv") %>%
-  filter(odds_ratio > 0) %>%
-  mutate(odds_ratio = replace(odds_ratio, odds_ratio == "Inf", 400),
-         log_p = -log10(pvalue),
-         dataset = "Shuffled data",
-         mhc = "MHC-I") %>%
-  select(odds_ratio,log_p,dataset,mhc,significant)
-
-dat <- rbind(d1,d2,d3,d4)
-dat$dataset <- factor(dat$dataset,levels=c("True data","Shuffled data"))
-dat$mhc <- factor(dat$mhc, levels=c("MHC-II","MHC-I"))
-
-# plot
-p <- ggplot(dat, aes(x=odds_ratio, y=log_p, colour=significant))+
-  geom_point(alpha=0.5)+
-  facet_grid(dataset~mhc)+
-  scale_colour_manual(values = c("darkgrey","darkblue"))+
-  scale_x_log10()+
-  My_Theme +
-  labs(y= "-log10 p-value",
-       x = "odds ratio")
-ggsave("Figure4D.png",p, units = "cm", width = 15.9, height = 11.9, dpi = 600)
+ggarrange(p4C,
+          labels = list("C"),
+          font.label = list(size = 10, face = "bold", colour = "black"))
+ggsave("Figure4C.svg", 
+       units = "cm", width = 12, height =6, dpi=300)
 
 # Figure 4E ####
 # load metaclonotypist output
 b1 <- read.csv("output/metaclonotypist_beta_mhcI/hlametaclonotypes_beta_mhcI.csv")
 b2 <- read.csv("output/metaclonotypist_beta_mhcII/hlametaclonotypes_beta_mhcII.csv")
 # alternative (using Supplementary tables)
-#b1 <- read.csv("data/TableS7.csv")
+#b1 <- read.csv("data/TableS5.csv")
 #b2 <- read.csv("data/TableS4.csv")
 
 
@@ -139,12 +102,17 @@ b2$hla <- factor(b2$hla, levels=b2$hla[order(b2$n)])
 b <- rbind(b1,b2)
 b$dataset <- factor(b$dataset,levels = c("MHC-II","MHC-I"))
 
-# plot (save as svg 900x400)
-ggplot(b,aes(x=reorder(hla,desc(hla)),y=n)) +
+# plot 
+p4E <- ggplot(b,aes(x=reorder(hla,desc(hla)),y=n)) +
   geom_bar(stat = "identity",fill="blue") +
   facet_wrap(~dataset,scale="free_x") +
   force_panelsizes(cols = c(15,1)) +
   My_Theme +
   labs(x="HLA association",
-       y="Number of metaclones") +
+       y="Metaclones (N)") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))
+ggarrange(p4E,
+          labels = list("E"),
+          font.label = list(size = 10, face = "bold", colour = "black"))
+ggsave("Figure4E.svg", 
+       units = "cm", width = 17, height =6, dpi=300)
