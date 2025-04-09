@@ -33,12 +33,12 @@ dat <- read.csv("data/Figure5A_odds-ratio.csv") %>%
          Log10.ORLL=log10(CI_lower),
          Log10.ORUL=log10(CI_higher),
          DatasetLabel = recode(dataset,
-                          "PBMC" = "PPD:TT stimulated.PBMC",
-                          "Tcells" = "Mtb:SARS-CoV2 reactive.Tcells",
-                          "scLung" = "TB:Cancer Lung",
-                          "Blood" = "TB:Cancer Blood",
-                          "CD4-T" = "Lung:Blood CD4.Tcells",
-                          "Lung" = "TB:Cancer Lung"),
+                               "PBMC" = "PPD:TT stimulated.PBMC",
+                               "Tcells" = "Mtb:SARS-CoV2 reactive.Tcells",
+                               "scLung" = "TB:Cancer Lung",
+                               "Blood" = "TB:Cancer Blood",
+                               "CD4-T" = "Lung:Blood CD4.Tcells",
+                               "Lung" = "TB:Cancer Lung"),
          Seq.Method = recode(dataset,
                              "PBMC" = "Bulk",
                              "Tcells" = "SingleCell",
@@ -47,14 +47,14 @@ dat <- read.csv("data/Figure5A_odds-ratio.csv") %>%
                              "CD4-T" = "Bulk",
                              "Lung" = "Bulk"))
 dat$algorithm <- factor(dat$algorithm , levels = c("Discovery TST CDR3s",
-                                               "Metaclonotypist regex",
-                                               "Gliph2 pattern",
-                                               "Gliph2-matching CDR3s"))
+                                                   "Metaclonotypist regex",
+                                                   "Gliph2 pattern",
+                                                   "Gliph2-matching CDR3s"))
 dat$DatasetLabel <- factor(dat$DatasetLabel, levels = c("PPD:TT stimulated.PBMC",
-                                                    "Mtb:SARS-CoV2 reactive.Tcells",
-                                                    "TB:Cancer Lung",
-                                                    "TB:Cancer Blood",
-                                                    "Lung:Blood CD4.Tcells"))
+                                                        "Mtb:SARS-CoV2 reactive.Tcells",
+                                                        "TB:Cancer Lung",
+                                                        "TB:Cancer Blood",
+                                                        "Lung:Blood CD4.Tcells"))
 
 p5A <- ggplot(dat, aes(x=DatasetLabel,y=Log10.OR,colour = algorithm, shape=Seq.Method)) +
   geom_point(stat = "identity", position = position_dodge2(width=0.5), size=2, alpha=0.8)+
@@ -177,16 +177,17 @@ b <- read.csv("data/Publicity_all-vs-published-vs-metaclone_down-sampled_beta_ex
 a <- a %>% mutate(Clone.Size = "All TCRs")
 b <- b %>% mutate(Clone.Size = "Expanded TCRs")
 
-summary <- rbind(a,b) %>% rename(TCR = "dataset") %>%
+summary <- rbind(a,b) %>%
+  dplyr::rename(TCR = "dataset") %>%
   mutate(TCR = recode(TCR,
-                      "CDR3 with published Mtb reactivity" = "CDR3 (published Mtb reactivity)",
+                      "CDR3 with published Mtb reactivity" = "CDR3 \n(published Mtb reactivity)",
                       "CDR3" = "CDR3 (D7 TST)"))
 
 # plot
 p5D <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
   geom_line() +
   geom_point(alpha=0.8) +
-  scale_colour_manual(values=c("orange","darkred","navy")) +
+  scale_colour_manual(values=c("orange","darkred","blue")) +
   facet_wrap(~Clone.Size)+
   scale_x_log10()+
   labs(x="Number of TCRs (ranked by publicity)",
@@ -196,15 +197,31 @@ p5D <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
         panel.spacing = unit(0.5, "cm", data = NULL),
         plot.margin = unit(c(0.2,0,0.5,0.5),"cm"))
 
+# Figure 5E ####
+mc <- read.csv("data/TableS4.csv") %>%
+  mutate(hla.pct = count_allele/total_allele*100)
+p5E <- ggplot(mc, aes(x=hla.pct)) +
+  geom_histogram(binwidth = 10,color = "blue", fill = "white") +
+  coord_cartesian(xlim = c(0,105)) +
+  My_Theme +
+  labs(x = "% HLA+ subjects \n with \u2265 1 metaclone TCR",
+       y = "Number of metaclones")
+
 # assemble figure ####
 r2 <- ggarrange(p5B,p5C,
                 ncol = 2,
                 widths = c(1,1.2),
                 labels = c("B","C"),
                 font.label = list(size = 10, face = "bold", colour = "black"))
-ggarrange(p5A,r2,p5D,
+r3 <- ggarrange(p5D,p5E,
+                ncol = 2,
+                widths = c(2.5,1),
+                labels = c("D","E"),
+                font.label = list(size = 10, face = "bold", colour = "black"))
+
+ggarrange(p5A,r2,r3,
           nrow = 3,
-          labels = c("A","","D"),
+          labels = c("A","",""),
           font.label = list(size = 10, face = "bold", colour = "black"))
 
 ggsave("Figure5.svg", 
