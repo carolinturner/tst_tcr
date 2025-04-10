@@ -180,14 +180,15 @@ b <- b %>% mutate(Clone.Size = "Expanded TCRs")
 summary <- rbind(a,b) %>%
   dplyr::rename(TCR = "dataset") %>%
   mutate(TCR = recode(TCR,
-                      "CDR3 with published Mtb reactivity" = "CDR3 \n(published Mtb reactivity)",
-                      "CDR3" = "CDR3 (D7 TST)"))
+                      "CDR3 with published Mtb reactivity" = "Published Mtb CDR3s",
+                      "CDR3" = "D7 TST CDR3s",
+                      "metaclone"="D7 TST metaclones"))
 
 # plot
 p5D <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
   geom_line() +
   geom_point(alpha=0.8) +
-  scale_colour_manual(values=c("orange","darkred","blue")) +
+  scale_colour_manual(values=c("darkred","navy","orange")) +
   facet_wrap(~Clone.Size)+
   scale_x_log10()+
   labs(x="Number of TCRs (ranked by publicity)",
@@ -195,17 +196,25 @@ p5D <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
   My_Theme +
   theme(legend.position = "right",legend.justification="top",
         panel.spacing = unit(0.5, "cm", data = NULL),
-        plot.margin = unit(c(0.2,0,0.5,0.5),"cm"))
+        plot.margin = unit(c(0.2,1,0.5,0.5),"cm"))
 
 # Figure 5E ####
 mc <- read.csv("data/TableS4.csv") %>%
-  mutate(hla.pct = count_allele/total_allele*100)
-p5E <- ggplot(mc, aes(x=hla.pct)) +
-  geom_histogram(binwidth = 10,color = "blue", fill = "white") +
-  coord_cartesian(xlim = c(0,105)) +
+  mutate(hla.pct = count_allele/(count_allele+count_other)*100,
+         hla.freq = count_allele+count_other)
+
+p5E <- mc %>%
+  mutate_at("index", as.character) %>% 
+  ggplot()+
+  geom_point(aes(x=hla.freq,y=hla.pct,colour=index))+
+  coord_cartesian(ylim = c(0,100)) +
+  labs(x="HLA frequency",
+       y="Percentage of all participants \nwith cognate HLA",
+       title = "Individual metaclones by colour")+
   My_Theme +
-  labs(x = "% HLA+ subjects \n with \u2265 1 metaclone TCR",
-       y = "Number of metaclones")
+  theme(plot.margin = unit(c(0.2,0.5,0.5,0),"cm"),
+        legend.position = "none")
+p5E
 
 # assemble figure ####
 r2 <- ggarrange(p5B,p5C,
@@ -215,7 +224,7 @@ r2 <- ggarrange(p5B,p5C,
                 font.label = list(size = 10, face = "bold", colour = "black"))
 r3 <- ggarrange(p5D,p5E,
                 ncol = 2,
-                widths = c(2.5,1),
+                widths = c(2,1),
                 labels = c("D","E"),
                 font.label = list(size = 10, face = "bold", colour = "black"))
 
