@@ -4,37 +4,9 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-# load module scores
-scores <- read.csv("Modules_Summary.csv")
+# load Z-scaled module scores
+dat <- read.csv("Modules_Z-scores.csv")
 
-# load metadata
-meta <- read.csv("RNAseq_metadata.csv")
-meta.stim <- meta %>% select(sample,Stimulant)
-
-
-### Z-score scaled module scores (using saline samples as control)
-# add stimulant column to module score dataframe
-scores <- scores %>%
-  left_join(meta.stim) %>%
-  select(sample,Stimulant,everything())
-
-# pivot longer
-d <- scores %>%
-  pivot_longer(3:ncol(scores),names_to = "module_name", values_to = "moduleTPM")
-
-# filter control values (= salines) and assign to new dataframe
-c <- d %>%
-  filter(Stimulant == "saline") %>%
-  group_by(module_name) %>%
-  summarise(mean_sal = mean(moduleTPM),
-            sd_sal = sd(moduleTPM))
-
-# calculate Z-scaled module scores
-dat <- d %>%
-  left_join(c) %>%
-  mutate(module_Zscore = ((moduleTPM - mean_sal)/sd_sal))
-
-### Correlation matrix (D7 samples)
 # select D7 samples and reformat data
 df <- dat %>%
   filter(Stimulant == "TST_D7") %>%

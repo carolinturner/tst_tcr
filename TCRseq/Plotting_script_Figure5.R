@@ -209,7 +209,7 @@ p5E <- mc %>%
   geom_point(aes(x=hla.freq,y=hla.pct,colour=index))+
   coord_cartesian(ylim = c(0,100)) +
   labs(x="HLA frequency",
-       y="Percentage of all participants \nwith cognate HLA",
+       y="Percentage of  participants \nwith cognate HLA",
        title = "Individual metaclones by colour")+
   My_Theme +
   theme(plot.margin = unit(c(0.2,0.5,0.5,0),"cm"),
