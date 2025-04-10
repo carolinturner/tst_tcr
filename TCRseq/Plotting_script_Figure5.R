@@ -214,7 +214,6 @@ p5E <- mc %>%
   My_Theme +
   theme(plot.margin = unit(c(0.2,0.5,0.5,0),"cm"),
         legend.position = "none")
-p5E
 
 # assemble figure ####
 r2 <- ggarrange(p5B,p5C,
