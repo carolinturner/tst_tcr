@@ -1,8 +1,8 @@
 # Scripts for metaclone discovery analyses
 
-The scripts provided here were adapted from code written by Dr Andreas Mayer-Tiffeau, and used for metaclone discovery analyses in the [TST TCR publication](link here once available), to identify metaclonotypist- and gliph2-derived T cell metaclones. The output of these scripts is required as input for some of the _TCRseq_scripts_ and _Plotting_scripts_ listed in the TCRseq directory of this GitHub repository. Relevant output tables are also summarised in Supplementary Tables S4-S7 of the [manuscript](link here once available). 
+The scripts provided here were adapted from code written by Dr Andreas Mayer-Tiffeau, and used for metaclone discovery analyses in the [TST TCR pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1), to identify metaclonotypist- and GLIPH2-derived T cell metaclones. The output of these scripts is required as input for some of the _TCRseq_scripts_ and _Plotting_scripts_ listed in the TCRseq directory of this GitHub repository. Relevant output tables are also summarised in Supplementary Tables S4-S7 of the [pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1). 
 
-To run the code, processed TCRseq data and associated metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public). HLA imputations for participants are available as Table S3 of the [manuscript](link here once available). All source data should be saved in a subdirectory called `data`.
+At time of peer-reviewed publication of the manuscript, the processed TCRseq data and associated metadata that are needed to run the scripts can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public). HLA imputations for participants are available as Table S3 of the [pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1). All source data should be saved in a subdirectory called `data`.
  
 Metadata = `metadata.csv`
 HLA data = Table S3 saved as `TableS3.csv`

@@ -1,10 +1,10 @@
 # Scripts for TCRseq analyses
 
-The scripts provided here were used for TCRseq analyses in the [TST TCR publication](link here once available). `TCRseq_scripts` generate the data required for `Plotting_scripts` to make Figures 2-5 and Supplementary Figures S3-S11 as detailed below. Figures 4 and S7 were assembled in Inkscape.
+The scripts provided here were used for TCRseq analyses in the [TST TCR pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1). `TCRseq_scripts` generate the data required for `Plotting_scripts` to make Figures 2-5 and Supplementary Figures S3-S11 as detailed below. Figures 4 and S7 were assembled in Inkscape.
 
 **Input data:**
-* Processed TCRseq data and metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
-* Antigen-reactive CDR3 sequences collated from published sources are available as Table S2 of the [manuscript](link here once available).
+* At time of peer-reviewer publication of the manuscript, processed TCRseq data and metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
+* Antigen-reactive CDR3 sequences collated from published sources are available as Table S2 of the [pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1).
 * HLA imputations for participants are available as Table S3.
 * Metaclone summaries (including HLA association and regular expression patterns) are available as Tables S4-S7. These metaclones were discovered using the code available in the metaclone directory of this GitHub repository.
 * All source data should be saved in a subdirectory called `data`.
@@ -21,7 +21,7 @@ The scripts provided here were used for TCRseq analyses in the [TST TCR publicat
 * `TCRseq_script_8.R`: Expansion of antigen-reactive TCRs in paired TST samples from day 2 and day 7
 * `TCRseq_script_9.R`: Calculate abundance of metaclones in blood and TST 
 * `TCRseq_script_10.R`: Identify most abundant and most public metaclones in day 7 TST
-* `TCRseq_script_11.R`: Calculate abundance (and odds ratios) of metaclones and gliph2 patterns in validation datasets
+* `TCRseq_script_11.R`: Calculate abundance (and odds ratios) of metaclones and GLIPH2 patterns in validation datasets
 * `TCRseq_script_12.R`: Compare abundance of metaclones and published Mtb-reactive TCRs
 * `TCRseq_script_13.R`: Compare abundance of metaclones and private Mtb-reactive TCRs
 * `TCRseq_script_14.R`: Assess publicity of Mtb-reactive TCRs in day 7 TST

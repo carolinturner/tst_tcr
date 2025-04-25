@@ -1,8 +1,8 @@
 # Scripts for RNAseq analyses
 
-The scripts provided here were used for RNAseq analyses in the [TST TCR publication](link here once available). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 2. 
+The scripts provided here were used for RNAseq analyses in the [TST TCR pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 2. 
 
-Source data can be downloaded from [Array Express](https://www.ebi.ac.uk/arrayexpress), accession number E-MTAB-14687.
+At time of peer-reviewed publication of the manuscript, processed RNAseq source data can be downloaded from [Array Express](https://www.ebi.ac.uk/arrayexpress), accession number E-MTAB-14687.
  
 Metadata = `sdrf.tsv`
 Raw counts matrix = `rawcounts.csv`
