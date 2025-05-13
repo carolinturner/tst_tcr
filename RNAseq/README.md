@@ -25,6 +25,6 @@ To make:
 * **Figure S2B**: RNAseq_script_1 &rarr; RNAseq_script_3 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_8 &rarr; Gephi network visualisation
 * **Figure S2C-D**: RNAseq_script_1 &rarr; RNAseq_script_4 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_9 &rarr; Plotting_script_FigureS2C-D
 * **Figure S2E**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; Plotting_script_FigureS2E
-* **Figure S2F**: RNAseq_script_1 &rarr; RNAseq_script_5 &rarr; RNAseq_script_6 &rarr; Plotting_script_FigureS2F
+* **Figure S2F**: RNAseq_script_1 &rarr; RNAseq_script_2 and RNAseq_script_3 &rarr; RNAseq_script_5 &rarr; RNAseq_script_6 &rarr; Plotting_script_FigureS2F
 * **Figure 1A-B**: RNAseq_script_1 &rarr; RNAseq_script_10 &rarr; Plotting_script_Figure1A-B
 * **Figure 1C**: RNAseq_script_1 &rarr; RNAseq_script_10 &rarr; Plotting_script_Figure1C
