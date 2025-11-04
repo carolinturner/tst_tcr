@@ -199,7 +199,10 @@ p5D <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
         plot.margin = unit(c(0.2,1,0.5,0.5),"cm"))
 
 # Figure 5E ####
-mc <- read.csv("data/TableS4.csv") %>%
+mc <- read.csv("data/FileS5.csv") %>%
+  group_by(index) %>%
+  slice_min(pvalue,n=1) %>%
+  ungroup() %>%
   mutate(hla.pct = count_allele/(count_allele+count_other)*100,
          hla.freq = count_allele+count_other)
 

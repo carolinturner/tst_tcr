@@ -1,11 +1,11 @@
-## RNAseq script 9: Module analysis
+## RNAseq script 10: Module analysis
 
-# download Table S1 from paper and save in working directory as 'modules.csv'
+# download Supplementary File S2 from paper and save as 'modules.csv'
 
 library(tidyverse)
 
-tpm <- read.csv("tpm_PC0.001_log2_genesymbol_dedup.csv",row.names = 1)
-modules <- read.csv("modules.csv") 
+tpm <- read.csv("data/tpm_PC0.001_log2_genesymbol_dedup.csv",row.names = 1)
+modules <- read.csv("data/modules.csv") 
 
 # calculate module score per sample
 summary <- data.frame()
@@ -21,10 +21,10 @@ for (i in 1:nrow(modules)){
 row.names(summary) <- modules$module
 
 summary.t <- as.data.frame(t(summary)) %>% rownames_to_column("sample")
-write.csv(summary.t,"Modules_summary.csv",row.names = F)
+write.csv(summary.t,"data/Modules_summary.csv",row.names = F)
 
 # scale module scores using saline samples as control
-meta <- read.csv("RNAseq_metadata.csv") %>% select(-UIN)
+meta <- read.csv("data/RNAseq_metadata.csv") %>% select(-UIN)
 dat <- left_join(summary.t,meta)  
   
 # convert into long format
@@ -41,4 +41,4 @@ colnames(c) <- c("module_name", "mean.moduleTPM", "sd.moduleTPM")
 # merge with original df by module_name and calculate Z-scores
 d <- left_join(d, c, by = "module_name") %>%
   mutate(module_Zscore = (moduleTPM-mean.moduleTPM)/sd.moduleTPM)
-write.csv(d, "Modules_Z-scores.csv",row.names = F)
+write.csv(d, "data/Modules_Z-scores.csv",row.names = F)

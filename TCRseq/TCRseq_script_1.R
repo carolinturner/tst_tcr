@@ -10,8 +10,9 @@
 # - acquired with ImmunoSeq protocol
 # - pre-processing: tidy metadata, combine samples in one file
 
+## input data:
 # download TCRseq data and metadata from UCL's Research Data Repository: DOI 10.5522/04/28049606
-# download HLA data from manuscript, save as TableS3.csv
+# download HLA data from manuscript, save as FileS4.csv
 # save all source data in a sub-directory called data
 
 library(tidyverse)
@@ -97,6 +98,17 @@ for (chain in c("alpha","beta")){
   }
   fwrite(summary,file = paste0("data/combined_",chain,".csv.gz"))
 }
+
+# read depth per sample type - use for manuscript text
+depth.beta <- summary %>%
+  filter(tissue %in% c("Blood","TST_D2","TST_D7")) %>%
+  group_by(Sample) %>%
+  mutate(total = sum(duplicate_count)) %>%
+  ungroup() %>%
+  group_by(tissue) %>%
+  summarise(min = min(total),
+            max = max(total),
+            median = median(total))
 
 # Step 3: down-sampling of blood and TST samples ####
 

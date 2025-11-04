@@ -1,13 +1,13 @@
-## RNAseq_script_8: Identification of statistically significant co-regulated upstream regulator modules (all TST vs saline)
+## RNAseq_script_9: Identification of statistically significant co-regulated upstream regulator modules (all TST vs saline)
 
 # script adapted from Blanca Sanz-Magallon Duque De Estrada
 
 library(tidyverse)
 
 ## A. Input files - replace as necessary
-tpm <- read.csv("tpm_TST-transcriptome.csv", row.names = 1)
-ipa <- read.table("IPA_output/TSTvsSaline.txt", sep = "\t", skip=2, header=T)
-meta <- read.csv("RNAseq_metadata.csv", header = TRUE, row.names = 1)
+tpm <- read.csv("data/tpm_TST-transcriptome.csv", row.names = 1)
+ipa <- read.table("data/IPA_output/TSTvsSaline.txt", sep = "\t", skip=2, header=T)
+meta <- read.csv("data/RNAseq_metadata.csv", header = TRUE, row.names = 1)
 
 ## B. Create a co-correlation matrix of the TST transcriptome (including only relevant TST samples)
 meta.ss <- meta %>% filter(Stimulant %in% c("TST_D7"))
@@ -90,7 +90,7 @@ ipa_less_0.05$adj_pvalue <- ipa_less_0.05$pvalue*fdr_threshold # calculating the
 ipa_significant <- ipa_less_0.05[which(ipa_less_0.05$adj_pvalue <= 0.05),] # selecting clusters with adj. p-value <= 0.05
 
 ## G. Output file
-write.csv(ipa_significant, "URA_TSTvsSaline_fdrsig_648size.csv", row.names = F) # clusters with adj. p-value <= 0.05
+write.csv(ipa_significant, "data/URA_TSTvsSaline_fdrsig_648size.csv", row.names = F) # clusters with adj. p-value <= 0.05
 
 ## H. Format files
 rownames(ipa_significant) <- ipa_significant$regulator
@@ -127,5 +127,5 @@ for (i in 1:max(ipa$ID)){
 }
 
 ## J. Output files
-write.csv(sample_cluster_expression, "TST_fdrsig_UR_module_expression_per_sample.csv", row.names = FALSE)
+write.csv(sample_cluster_expression, "data/TST_fdrsig_UR_module_expression_per_sample.csv", row.names = FALSE)
 

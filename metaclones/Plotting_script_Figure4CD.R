@@ -72,17 +72,32 @@ p4C <- ggplot(b.long,aes(max_tcrdist,Value,colour=dataset))+
 ggarrange(p4C,
           labels = list("C"),
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("Figure4C.svg", 
+ggsave("figures/Figure4C.svg", 
        units = "cm", width = 12, height =6, dpi=300)
 
-# Figure 4E ####
+# Figure 4D ####
 # load metaclonotypist output
-b1 <- read.csv("output/metaclonotypist_beta_mhcI/hlametaclonotypes_beta_mhcI.csv")
-b2 <- read.csv("output/metaclonotypist_beta_mhcII/hlametaclonotypes_beta_mhcII.csv")
-# alternative (using Supplementary tables)
-#b1 <- read.csv("data/TableS5.csv")
-#b2 <- read.csv("data/TableS4.csv")
-
+b1 <- read.csv("output/metaclonotypist_beta_mhcI/hlametaclonotypes_beta_mhcI.csv") %>%
+  group_by(index) %>%
+  slice_min(pvalue,n=1) %>%
+  select(index,hla) %>%
+  ungroup()
+b2 <- read.csv("output/metaclonotypist_beta_mhcII/hlametaclonotypes_beta_mhcII.csv") %>%
+  group_by(index) %>%
+  slice_min(pvalue,n=1) %>%
+  select(index,hla) %>%
+  ungroup()
+# alternative (using Supplementary files)
+#b1 <- read.csv("data/FileS6.csv") %>%
+#  group_by(index) %>%
+#  slice_min(pvalue,n=1) %>%
+#  select(index,hla) %>%
+#  ungroup()
+#b2 <- read.csv("data/FileS5.csv") %>%
+#  group_by(index) %>%
+#  slice_min(pvalue,n=1) %>%
+#  select(index,hla) %>%
+#  ungroup()
 
 # calculate number of HLA associations
 b1 <- b1 %>%
@@ -103,16 +118,16 @@ b <- rbind(b1,b2)
 b$dataset <- factor(b$dataset,levels = c("MHC-II","MHC-I"))
 
 # plot 
-p4E <- ggplot(b,aes(x=reorder(hla,desc(hla)),y=n)) +
+p4D <- ggplot(b,aes(x=reorder(hla,desc(hla)),y=n)) +
   geom_bar(stat = "identity",fill="blue") +
   facet_wrap(~dataset,scale="free_x") +
   force_panelsizes(cols = c(15,1)) +
   My_Theme +
-  labs(x="HLA association",
+  labs(x="Lead HLA association",
        y="Metaclones (N)") +
   theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0))
-ggarrange(p4E,
-          labels = list("E"),
+ggarrange(p4D,
+          labels = list("D"),
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("Figure4E.svg", 
+ggsave("figures/Figure4D.svg", 
        units = "cm", width = 17, height =6, dpi=300)

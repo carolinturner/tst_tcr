@@ -27,7 +27,7 @@ My_Theme = theme(
   plot.margin = unit(c(0.2,0.6,0.5,0.5),"cm")
 )
 
-# Figure S9A: down-sampled beta ###
+# Figure S12A: down-sampled beta ###
 a <- read.csv("data/Summary_percentage_beta_size-matched-mc-mtb_search_down-sampled_expanded_gr0.csv")
 b <- read.csv("data/Summary_percentage_beta_size-matched-mc-mtb_search_down-sampled_expanded_gr1.csv")
 
@@ -48,7 +48,7 @@ stats <- summary %>%
   pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
 
 # plot 
-pS9A <- ggplot(summary, aes(x=tissue,y=pct))+
+pS12A <- ggplot(summary, aes(x=tissue,y=pct))+
   geom_boxplot(colour="blue")+
   facet_grid(Clone.Size~TCR)+
   scale_y_log10(expand = expansion(mult=c(0,0.1)))+
@@ -60,7 +60,7 @@ pS9A <- ggplot(summary, aes(x=tissue,y=pct))+
   ggtitle("beta (down-sampled)")
 
 
-# Figure S9B: full repertoires beta ####
+# Figure S12B: full repertoires beta ####
 a <- read.csv("data/Summary_percentage_beta_size-matched-mc-mtb_search_full-repertoires_expanded_gr0.csv")
 b <- read.csv("data/Summary_percentage_beta_size-matched-mc-mtb_search_full-repertoires_expanded_gr1.csv")
 
@@ -81,7 +81,7 @@ stats <- summary %>%
   pairwise_wilcox_test(data = ., pct~tissue, p.adjust.method = "fdr") 
 
 # plot 
-pS9B <- ggplot(summary, aes(x=tissue,y=pct))+
+pS12B <- ggplot(summary, aes(x=tissue,y=pct))+
   geom_boxplot(colour="blue")+
   facet_grid(Clone.Size~TCR)+
   scale_y_log10(expand = expansion(mult=c(0,0.1)))+
@@ -93,9 +93,9 @@ pS9B <- ggplot(summary, aes(x=tissue,y=pct))+
   ggtitle("beta (full repertoire)")
 
 # assemble figure ####
-ggarrange(pS9A,pS9B,
+ggarrange(pS12A,pS12B,
           ncol = 2,
           labels = c("A","B"),
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("FigureS9.svg", 
+ggsave("figures/FigureS12.svg", 
        units = "cm", width = 17, height =9 , dpi=300)

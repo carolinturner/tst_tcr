@@ -5,7 +5,7 @@ library(ComplexHeatmap)
 library(circlize)
 
 # load Z-scaled module scores
-dat <- read.csv("Modules_Z-scores.csv")
+dat <- read.csv("data/Modules_Z-scores.csv")
 
 # select D7 samples and reformat data
 df <- dat %>%

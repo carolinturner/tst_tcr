@@ -1,5 +1,4 @@
 library(tidyverse)
-library(rstatix)
 library(ggpubr)
 
 #My_Theme
@@ -23,38 +22,33 @@ My_Theme = theme(
   legend.margin = margin(0, 0, 0, 0),
   legend.box.margin = margin(0,0,0,0),
   legend.box.spacing = unit(c(0,0,0,0.1),"cm"),
-  panel.spacing.x = unit(0.05,"cm"),
-  plot.margin = unit(c(0.2,0.6,0.5,0.5),"cm")
-)
+  panel.spacing.x = unit(0.05,"cm")
+  )
+
 
 # full repertoires beta ####
-a <- read.csv("data/summary_metaclone-abundance_full-repertoires_beta_expanded_gr0.csv")
-b <- read.csv("data/summary_metaclone-abundance_full-repertoires_beta_expanded_gr1.csv")
+a <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_beta_expanded_gr0.csv")
+b <- read.csv("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_beta_expanded_gr1.csv")
 
-# beta chain data
-c <- a %>% mutate(Clone.Size = "All TCRs")
-d <- b %>% mutate(Clone.Size = "Expanded TCRs")
+a <- a %>% mutate(Clone.Size = "All TCRs")
+b <- b %>% mutate(Clone.Size = "Expanded TCRs")
 
-summary <- rbind(c,d) %>%
-  mutate(tissue = recode(tissue,
-                         TST_D2 = "Day 2 TST",
-                         TST_D7 = "Day 7 TST"))
-# stats
-stats.all <- summary %>%
-  group_by(Clone.Size) %>%
-  pairwise_wilcox_test(data = .,mc.pct~tissue, p.adjust.method = "fdr")
+summary <- rbind(a,b) %>% rename(TCR = "dataset") %>%
+  mutate(TCR = recode(TCR,
+                      "CDR3 with published Mtb reactivity" = "CDR3 (published Mtb reactivity)",
+                      "CDR3" = "CDR3 (D7 TST)"))
 
-# plot
-pS8 <- ggplot(summary, aes(x=tissue,y=mc.pct))+
-  geom_boxplot(colour="blue")+
-  facet_wrap(~Clone.Size,ncol = 5)+
-  scale_y_log10(limits = c(0.03,100))+
-  labs(y="% of TCRs") +
-  My_Theme+
-  theme(axis.text.x = element_text(size = t, face = "bold", colour = tc, angle = -45, hjust = 0),
-        axis.title.x = element_blank())+
-  stat_pvalue_manual(stats.all, label = "p.adj.signif",y.position=c(log10(15),log10(30),log10(60)), size = 2) +
+pS14 <- ggplot(summary, aes(x=rank,y=cum.prop.people,color=TCR))+
+  geom_line() +
+  geom_point() +
+  scale_colour_manual(values=c("orange","darkred","navy")) +
+  facet_wrap(~Clone.Size)+
+  scale_x_log10()+
+  labs(x="number of TCRs (ranked by publicity)",
+       y="proportion of participants \n(cumulative)") +
+  My_Theme +
+  #theme(legend.position = "top",legend.justification="left") +
   ggtitle("beta (full repertoire)")
 
-ggsave("FigureS8.svg", 
-       units = "cm", width = 7, height =6 , dpi=300)
+ggsave("figures/FigureS14.svg", 
+       units = "cm", width = 12, height =6 , dpi=300)

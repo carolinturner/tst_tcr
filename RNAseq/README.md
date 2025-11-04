@@ -1,6 +1,7 @@
 # Scripts for RNAseq analyses
 
-The scripts provided here were used for RNAseq analyses in the [TST TCR pre-print](https://www.biorxiv.org/content/10.1101/2025.04.12.648537v1). _RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 2. 
+The scripts provided here were used for RNAseq analyses in the TST TCR manuscript.
+_RNAseq_scripts_ generate the data required for _Plotting_scripts_ to make Figure 1 and Supplementary Figure 2. _RNAseq_Table_script_ makes Table 1.
 
 At time of peer-reviewed publication of the manuscript, processed RNAseq source data can be downloaded from [Array Express](https://www.ebi.ac.uk/arrayexpress), accession number E-MTAB-14687.
  
@@ -21,6 +22,7 @@ Overview of analysis scripts:
 * `RNAseq_script_10.R`: Module analyses
 
 To make:
+* **Table 1**: RNAseq_Table_script.R
 * **Figure S2A**: RNAseq_script_1 &rarr; RNAseq_script_2 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_7 &rarr; Gephi network visualisation
 * **Figure S2B**: RNAseq_script_1 &rarr; RNAseq_script_3 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_8 &rarr; Gephi network visualisation
 * **Figure S2C-D**: RNAseq_script_1 &rarr; RNAseq_script_4 &rarr; IPA upstream regulator analysis &rarr; RNAseq_script_9 &rarr; Plotting_script_FigureS2C-D

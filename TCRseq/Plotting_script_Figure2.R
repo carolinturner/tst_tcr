@@ -80,7 +80,7 @@ a <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr0_beta.csv") 
 b <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr1_beta.csv") %>% mutate(Clone.Size = "Expanded TCRs")
 
 # number of published sequences
-ref <- read.csv("data/TableS2.csv") %>% filter(chain == "beta")
+ref <- read.csv("data/FileS3.csv") %>% filter(chain == "beta")
 CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
 CMV <- format(c(CMV),big.mark=",", trim=TRUE)
 EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
@@ -234,5 +234,5 @@ ggarrange(p2A,p2B,p3,
           heights = c(1,1.3,1.1),
           labels = list("A","B"),
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("Figure2.svg", 
+ggsave("figures/Figure2.svg", 
        units = "cm", width = 17, height =22 , dpi=300)

@@ -1,173 +1,112 @@
-library(data.table)
+## TCRseq_script_14: Compare abundance of metaclones and published Mtb-reactive TCRs (size-matched)
+
 library(tidyverse)
+library(data.table)
 
-# Step 1: full repertoires ####
-# load TST_D7 beta chain repertoires 
+# Step 1: extract metaclone CDR3s (mhc II) ####
+mc2 <- read.csv("data/FileS5.csv")
+
+mc.b <- as.vector(as.matrix(mc2[,"CDR3s"])) %>% unique()
+mc.b <- unlist(strsplit(mc.b,"\\|"))
+mc.b <- as.data.frame(unique(mc.b))
+colnames(mc.b) <- "CDR3"
+write.table(mc.b,"data/classII_beta_metaclone_CDR3s.csv",sep=",",col.names = F,row.names = F,quote = F)
+mc.cdr3 <- mc.b %>% pull(CDR3)
+
+# Step 2: down-sample published Mtb-reactive CDR3s to same number of metaclone CDR3s ####
+mtb.b <- read.csv("data/FileS3.csv") %>%
+  filter(reactivity == "Mtb" & chain == "beta") %>%
+  pull(CDR3) %>%
+  unique()
+
+set.seed(12345)
+mtb.sample <- sample(mtb.b,nrow(mc.b))
+
+# Step 3: quantify abundance in full repertoires ####
 data.b <- fread("data/combined_beta.csv.gz") %>%
-  filter(tissue == "TST_D7") 
+  filter(tissue %in% c("Blood","TST_D2","TST_D7")) 
 
-# Calculate publicity (using different expansion thresholds)
+# loop through different expansion thresholds
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
-  # select TCRs & count number of participants
+  # select TCRs
   dat <- data.b %>% filter(duplicate_count >f)
-  n <- length(unique(dat$sample))
+  dat$mtb <- ifelse(dat$junction_aa %in% mtb.sample, "Mtb", NA)
+  dat$mc <- ifelse(dat$junction_aa %in% mc.cdr3, "mc", NA)
+  # sum total/unique counts for each sample
+  d <- dat %>%
+    group_by(tissue,sample) %>% 
+    summarise(total.count = sum(duplicate_count)) %>%
+    ungroup()
   
-  # load references
-  mc.dat <- read.csv(paste0("data/metaclonotypist_results_full-repertoires_beta_expanded_gr",f,".csv")) %>%
-    filter(tissue == "TST_D7")
-  mtb.dat <- read.csv(paste0("data/Published-Ag-search_full-repertoires_expanded_gr",f,"_beta.csv")) %>%
-    filter(Mtb == "Mtb" & tissue == "TST_D7")
+  # sum total counts of mc and mtb hits for each sample
+  mtb <- dat %>%
+    filter(mtb == "Mtb") %>%
+    group_by(tissue,sample) %>%
+    summarise(total.mtb.count = sum(duplicate_count)) %>%
+    ungroup()
+  mc <- dat %>%
+    filter(mc == "mc") %>%
+    group_by(tissue,sample) %>%
+    summarise(total.mc.count = sum(duplicate_count)) %>%
+    ungroup()
   
-  # calculate publicity
-  cdr3 <- dat %>%
-    select(sample,junction_aa) %>%
-    unique() %>%
-    group_by(junction_aa) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "CDR3") %>%
-    rename(Id = "junction_aa") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
+  # merge dataframes and calculate %
+  merge.mtb <- inner_join(d,mtb) %>%
+    mutate(pct = total.mtb.count/total.count*100,
+           TCR = "published") %>%
+    select(tissue,sample,TCR,pct)
+  merge.mc <- inner_join(d,mc) %>%
+    mutate(pct = total.mc.count/total.count*100,
+           TCR = "metaclone") %>%
+    select(tissue,sample,TCR,pct)
   
-  mc <- mc.dat %>%
-    select(sample,mc.index) %>%
-    unique() %>%
-    group_by(mc.index) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "metaclone") %>%
-    rename(Id = "mc.index") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
-  
-  mtb <- mtb.dat %>%
-    select(sample,junction_aa) %>%
-    unique() %>%
-    group_by(junction_aa) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "CDR3 with published Mtb reactivity") %>%
-    rename(Id = "junction_aa") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
-  
-  # calculate cumulative proportion of people captured by most common metaclones/cdr3s
-  for (i in c(1:nrow(mc))){
-    df <- subset(mc.dat, mc.index %in% c(mc[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    mc[i,5] <- prop  
-  }
-  colnames(mc)[5] <- "cum.prop.people"
-  
-  for (i in c(1:nrow(mc))){ # only need to match number of metaclones
-    df <- subset(dat, junction_aa %in% c(cdr3[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    cdr3[i,5] <- prop  
-  }
-  colnames(cdr3)[5] <- "cum.prop.people"
-  
-  for (i in c(1:nrow(mc))){ # only need to match number of metaclones
-    df <- subset(mtb.dat, junction_aa %in% c(mtb[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    mtb[i,5] <- prop  
-  }
-  colnames(mtb)[5] <- "cum.prop.people"
-  
-  # merge & save
-  summary <- rbind(mc,cdr3,mtb) %>% filter(rank <= nrow(mc))
-  write.csv(summary,paste0("data/Publicity_all-vs-published-vs-metaclone_full-repertoires_beta_expanded_gr",f,".csv"))
+  # merge into one summary dataframe and prep for plotting
+  summary <- rbind(merge.mtb,merge.mc)
+  write.csv(summary,paste0("data/Summary_percentage_beta_size-matched-mc-mtb_search_full-repertoires_expanded_gr",f,".csv"))
 }
 
 
-# Step 2: down-sampled repertoires ####
-# load TST_D7 beta chain repertoires 
+# Step 4: quantify abundance in down-sampled repertoires ####
 data.b <- fread("data/combined_subsampled_beta.csv.gz") %>%
-  filter(tissue == "TST_D7")
+  filter(tissue %in% c("Blood","TST_D2","TST_D7"))
 
-# Calculate publicity (using different expansion thresholds)
+# loop through different expansion thresholds
 for (f in c(0:1)) {
   print(paste0("Expansion threshold: ",f))
-  # select TCRs & count number of participants
+  # select TCRs
   dat <- data.b %>% filter(duplicate_count >f)
-  n <- length(unique(dat$sample))
+  dat$mtb <- ifelse(dat$junction_aa %in% mtb.sample, "Mtb", NA)
+  dat$mc <- ifelse(dat$junction_aa %in% mc.cdr3, "mc", NA)
+    # sum total counts for each sample
+  d <- dat %>%
+    group_by(tissue,sample) %>% 
+    summarise(total.count = sum(duplicate_count)) %>%
+    ungroup()
   
-  # load references
-  mc.dat <- read.csv(paste0("data/metaclonotypist_results_down-sampled_beta_expanded_gr",f,".csv")) %>%
-    filter(tissue == "TST_D7")
-  mtb.dat <- read.csv(paste0("data/Published-Ag-search_down-sampled_expanded_gr",f,"_beta.csv")) %>%
-    filter(Mtb == "Mtb" & tissue == "TST_D7")
+  # sum total counts of mc and mtb hits for each sample
+  mtb <- dat %>%
+    filter(mtb == "Mtb") %>%
+    group_by(tissue,sample) %>%
+    summarise(total.mtb.count = sum(duplicate_count)) %>%
+    ungroup()
+  mc <- dat %>%
+    filter(mc == "mc") %>%
+    group_by(tissue,sample) %>%
+    summarise(total.mc.count = sum(duplicate_count)) %>%
+    ungroup()
   
-  # calculate publicity
-  cdr3 <- dat %>%
-    select(sample,junction_aa) %>%
-    unique() %>%
-    group_by(junction_aa) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "CDR3") %>%
-    rename(Id = "junction_aa") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
+  # merge dataframes and calculate %
+  merge.mtb <- inner_join(d,mtb) %>%
+    mutate(pct = total.mtb.count/total.count*100,
+           TCR = "published") %>%
+    select(tissue,sample,TCR,pct)
+  merge.mc <- inner_join(d,mc) %>%
+    mutate(pct = total.mc.count/total.count*100,
+           TCR = "metaclone") %>%
+    select(tissue,sample,TCR,pct)
   
-  mc <- mc.dat %>%
-    select(sample,mc.index) %>%
-    unique() %>%
-    group_by(mc.index) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "metaclone") %>%
-    rename(Id = "mc.index") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
-  
-  mtb <- mtb.dat %>%
-    select(sample,junction_aa) %>%
-    unique() %>%
-    group_by(junction_aa) %>%
-    mutate(publicity = length(unique(sample)),
-           dataset = "CDR3 with published Mtb reactivity") %>%
-    rename(Id = "junction_aa") %>%
-    ungroup() %>%
-    select(-sample) %>%
-    unique() %>%
-    arrange(-publicity) %>%
-    rowid_to_column("rank")
-  
-  # calculate cumulative proportion of people captured by most common metaclones/cdr3s
-  for (i in c(1:nrow(mc))){
-    df <- subset(mc.dat, mc.index %in% c(mc[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    mc[i,5] <- prop  
-  }
-  colnames(mc)[5] <- "cum.prop.people"
-  
-  for (i in c(1:nrow(mc))){ # only need to match number of metaclones
-    df <- subset(dat, junction_aa %in% c(cdr3[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    cdr3[i,5] <- prop  
-  }
-  colnames(cdr3)[5] <- "cum.prop.people"
-  
-  for (i in c(1:nrow(mc))){ # only need to match number of metaclones
-    df <- subset(mtb.dat, junction_aa %in% c(mtb[1:i,2]$Id))
-    prop <- (length(unique(df$sample)))/n
-    mtb[i,5] <- prop  
-  }
-  colnames(mtb)[5] <- "cum.prop.people"
-  
-  # merge & save
-  summary <- rbind(mc,cdr3,mtb) %>% filter(rank <= nrow(mc))
-  write.csv(summary,paste0("data/Publicity_all-vs-published-vs-metaclone_down-sampled_beta_expanded_gr",f,".csv"))
+  # merge into one summary dataframe and prep for plotting
+  summary <- rbind(merge.mtb,merge.mc)
+  write.csv(summary,paste0("data/Summary_percentage_beta_size-matched-mc-mtb_search_down-sampled_expanded_gr",f,".csv"))
 }

@@ -22,7 +22,7 @@ My_Theme = theme(
 )
 
 # load data
-dat <- read.csv("pathway_analysis.csv")
+dat <- read.csv("data/pathway_analysis.csv")
 # retain for each pathway group (= cluster cut) the name and statistics of the biggest annotated pathway
 dat <- dat %>% filter(!is.na(nAnno))
 

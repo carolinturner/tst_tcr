@@ -4,7 +4,7 @@ library(data.table)
 library(tidyverse)
 
 # load published sequences
-ref <- read.csv("data/TableS2.csv")
+ref <- read.csv("data/FileS3.csv")
 
 # Step 1: full repertoires ####
 alpha <- fread("data/combined_alpha.csv.gz") %>%

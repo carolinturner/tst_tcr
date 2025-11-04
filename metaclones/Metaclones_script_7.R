@@ -1,4 +1,4 @@
-# Script_7 (metaclones): finalise Gliph2 results
+# Metaclones_script_7: finalise Gliph2 results
 # - convert pattern to regular expression
 # - replace 'single' pattern (= fully public clusters) with CDR3
 
@@ -20,5 +20,5 @@ gliph <- gliph %>%
                           pattern))
   
   
-table <- if(mhc_class == "II"){"Table_S6"}else{"Table_S7"}
+table <- if(mhc_class == "II"){"FileS7"}else{"FileS8"}
 write.csv(gliph,paste0(table,"_gliph2_beta_mhc",mhc_class,".csv"),row.names = F)

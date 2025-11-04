@@ -15,7 +15,7 @@
 ################################################################################
 rm(list=ls())                                        # remove all the objects from the R session
 
-workDir <- "C:/path/to/your/working/directory/"      # working directory for the R session
+workDir <- "C:/path/to/your/working/directory/data/" # working directory for the R session
 
 projectName <- "TST vs Saline"                       # name of the project
 author <- "Your name"                                # author of the statistical analysis/report

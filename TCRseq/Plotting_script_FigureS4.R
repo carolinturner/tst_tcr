@@ -33,7 +33,7 @@ a <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr0_alpha.csv")
 b <- read.csv("data/Published-Ag-abundance_down-sampled_expanded_gr1_alpha.csv") %>% mutate(Clone.Size = "Expanded TCRs")
 
 # number of published sequences
-ref <- read.csv("data/TableS2.csv") %>% filter(chain == "alpha")
+ref <- read.csv("data/FileS3.csv") %>% filter(chain == "alpha")
 CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
 CMV <- format(c(CMV),big.mark=",", trim=TRUE)
 EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
@@ -80,7 +80,7 @@ a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_alpha.c
 b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_alpha.csv") %>% mutate(Clone.Size = "Expanded TCRs")
 
 # number of published sequences
-ref <- read.csv("data/TableS2.csv") %>% filter(chain == "alpha")
+ref <- read.csv("data/FileS3.csv") %>% filter(chain == "alpha")
 CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
 CMV <- format(c(CMV),big.mark=",", trim=TRUE)
 EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
@@ -127,7 +127,7 @@ a <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr0_beta.cs
 b <- read.csv("data/Published-Ag-abundance_full-repertoires_expanded_gr1_beta.csv") %>% mutate(Clone.Size = "Expanded TCRs")
 
 # number of published sequences
-ref <- read.csv("data/TableS2.csv") %>% filter(chain == "beta")
+ref <- read.csv("data/FileS3.csv") %>% filter(chain == "beta")
 CMV <- length(ref %>% filter(reactivity == "CMV") %>% pull(CDR3) %>% unique())
 CMV <- format(c(CMV),big.mark=",", trim=TRUE)
 EBV <- length(ref %>% filter(reactivity == "EBV") %>% pull(CDR3) %>% unique())
@@ -181,5 +181,5 @@ r2 <- ggarrange(pS4B,pS4C,
 ggarrange(r1,r2,
           nrow=2,
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("FigureS4.svg", 
+ggsave("figures/FigureS4.svg", 
        units = "cm", width = 17, height = 18 , dpi=300)

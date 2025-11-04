@@ -23,8 +23,8 @@ My_Theme = theme(
 )
 
 # read in module matrix and metadata
-dat <- read.csv("TST_fdrsig_UR_module_expression_per_sample.csv", header=T, row.names = 1)
-meta <- read.csv("RNAseq_metadata.csv", header=T, row.names = 1) %>%
+dat <- read.csv("data/TST_fdrsig_UR_module_expression_per_sample.csv", header=T, row.names = 1)
+meta <- read.csv("data/RNAseq_metadata.csv", header=T, row.names = 1) %>%
   select(Stimulant)
 
 ### Mann Whitney tests with FDR correction

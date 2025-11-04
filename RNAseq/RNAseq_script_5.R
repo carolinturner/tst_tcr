@@ -1,19 +1,19 @@
 ## RNAseq_script_5: SARtools DeSeq2 analysis D7 vs D2 (within integrated TST response)
 
 # split rawcounts matrix as input for SARtools
-d <- read.csv("rawcounts_integrated-TST-transcriptome.csv")
+d <- read.csv("data/rawcounts_integrated-TST-transcriptome.csv")
 gene_ids <- as.data.frame(d[,1])
 d1 <- round(d[,2:ncol(d)]) # round count values to integers
 names <- colnames(d1)
 
 # make a new folder where single count files will be saved to in .txt format
-dir.create("raw_integrated")
+dir.create("data/raw_integrated")
 
 # loop through samples, merge with list of genes and save as .txt file with sample name
 for (i in 1:length(names)){
   sample <- d1[,i]
   merged <- cbind(gene_ids,sample)
-  write.table(merged,file=paste0("raw_integrated/",names[i],".txt"),row.names=FALSE,col.names=FALSE,sep="\t")
+  write.table(merged,file=paste0("data/raw_integrated/",names[i],".txt"),row.names=FALSE,col.names=FALSE,sep="\t")
 }
 
 
@@ -32,7 +32,7 @@ for (i in 1:length(names)){
 ################################################################################
 rm(list=ls())                                        # remove all the objects from the R session
 
-workDir <- "C:/path/to/your/working/directory/"      # working directory for the R session
+workDir <- "C:/path/to/your/working/directory/data/" # working directory for the R session
 
 projectName <- "D7 vs D2"                            # name of the project
 author <- "Your name"                                # author of the statistical analysis/report

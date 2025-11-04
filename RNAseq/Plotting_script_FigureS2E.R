@@ -22,7 +22,7 @@ My_Theme = theme(
 )
 
 # read in data
-dat <- read.table("SARtools_output_D7vsD2/D7vsD2.complete.txt", header = T, row.names = 1)
+dat <- read.table("data/SARtools_output_D7vsD2/D7vsD2.complete.txt", header = T, row.names = 1)
 
 # add a column to specify if genes are up- or down-regulated (using as thresholds: log2 FC 1 and padj 0.05)
 dat$Genes <- "no differential expression"

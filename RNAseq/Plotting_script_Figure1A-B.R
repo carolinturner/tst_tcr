@@ -24,7 +24,7 @@ My_Theme = theme(
 )
 
 # data
-d <- read.csv("Modules_Z-scores.csv")
+d <- read.csv("data/Modules_Z-scores.csv")
 
 d <- d %>%
   mutate(Stimulant=recode(Stimulant,

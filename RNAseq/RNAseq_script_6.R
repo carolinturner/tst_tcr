@@ -1,15 +1,17 @@
+## RNAseq_script_6: XGR pathway analysis
+
 library(tidyverse)
 library(XGR)
 library(GeneOverlap)
 
 # load annotations file to allow mapping of Ensembl Gene IDs to Gene Symbols
-annotations <- read.csv("annotations_ref111.csv", header=T)
+annotations <- read.csv("data/annotations_ref111.csv", header=T)
 annotations <- annotations %>% 
   select(ensembl_gene_id, external_gene_name) %>%
   dplyr::rename(Id = ensembl_gene_id, GeneSymbol = external_gene_name)
 
 # load genes of interest (= output from DeSeq2 analysis)
-dat <- read.table("SARtools_output_D7vsD2/D7vsD2.complete.txt", header = T)
+dat <- read.table("data/SARtools_output_D7vsD2/D7vsD2.complete.txt", header = T)
 dat1 <- dat %>%
   filter(log2FoldChange <= -1 & padj < 0.05) %>%
   select(Id) %>%
@@ -78,4 +80,4 @@ clusterCut$name <- row.names(clusterCut)
 new_list_grouped <- left_join(pathways,clusterCut)
 
 # write to file
-write.csv(new_list_grouped, "pathway_analysis.csv",row.names = F)
+write.csv(new_list_grouped, "data/pathway_analysis.csv",row.names = F)

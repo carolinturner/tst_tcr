@@ -123,5 +123,5 @@ r2 <- ggarrange(p3C,p3D,
 ggarrange(r1,r2,
           nrow = 2,
           heights = c(0.7,2))
-ggsave("Figure3.png", # svg file too large to import to Word 
+ggsave("figures/Figure3.png", # svg file too large to import to Word 
        units = "cm", width = 17, height =20 , dpi=300)

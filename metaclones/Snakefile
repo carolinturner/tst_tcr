@@ -19,5 +19,5 @@ rule metaclonotypist:
     output:
         'results/stats_{chain}_td{max_tcrdist}_mc{mincount}_{testmethod}_{clustering}.csv'
     script:
-        'Script_3.py'
+        'Metaclones_script_3.py'
 

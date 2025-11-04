@@ -71,7 +71,7 @@ dat4 <- data.frame(dataset = rep("non-expanded_beta",2),
 d <- rbind(dat1,dat2,dat3,dat4)
 OR <- rbind(OR1,OR2,OR3,OR4)
 rownames(OR) <- c("expanded_alpha","non-expanded_alpha","expanded_beta","non-expanded_beta")
-#write.csv(OR,"data/FigureS7_odds-ratio.csv")
+write.csv(OR,"data/FigureS8B_odds-ratio.csv")
 
 # prep for plotting
 df <- d %>%
@@ -94,15 +94,15 @@ dat_text <- data.frame(
 )
 
 # plot
-pS7B <- ggplot(df, aes(x=Stimulant,y=Value))+
+pS8B <- ggplot(df, aes(x=Stimulant,y=Value))+
   geom_col()+
   facet_grid(chain ~ dataset)+
   geom_text(data=dat_text,label = dat_text$label,size = 6/.pt)+
   My_Theme+
   labs(y="Percentage of antigen-reactive CDR3s")
 
-ggarrange(pS7B,
+ggarrange(pS8B,
           labels = c("B"),
           font.label = list(size = 10, face = "bold", colour = "black"))
-ggsave("FigureS7B.svg", 
+ggsave("figures/FigureS8B.svg", 
        units = "cm", width = 8, height =8 , dpi=300)

@@ -1,13 +1,13 @@
-## RNAseq_script_6: Identification of statistically significant co-regulated upstream regulator modules (TST_D2 vs saline)
+## RNAseq_script_7: Identification of statistically significant co-regulated upstream regulator modules (TST_D2 vs saline)
 
 # script adapted from Blanca Sanz-Magallon Duque De Estrada
 
 library(tidyverse)
 
 ## A. Input files - replace as necessary
-tpm <- read.csv("tpm_D2-transcriptome.csv", row.names = 1)
-ipa <- read.table("IPA_output/TSTd2vsSaline.txt", sep = "\t", skip=2, header=T)
-meta <- read.csv("RNAseq_metadata.csv", header = TRUE, row.names = 1)
+tpm <- read.csv("data/tpm_D2-transcriptome.csv", row.names = 1)
+ipa <- read.table("data/IPA_output/TSTd2vsSaline.txt", sep = "\t", skip=2, header=T)
+meta <- read.csv("data/RNAseq_metadata.csv", header = TRUE, row.names = 1)
 
 ## B. Create a co-correlation matrix of the TST transcriptome (including only relevant TST samples)
 meta.ss <- meta %>% filter(Stimulant %in% c("TST_D2"))
@@ -90,7 +90,7 @@ ipa_less_0.05$adj_pvalue <- ipa_less_0.05$pvalue*fdr_threshold # calculating the
 ipa_significant <- ipa_less_0.05[which(ipa_less_0.05$adj_pvalue <= 0.05),] # selecting clusters with adj. p-value <= 0.05
 
 ## G. Output file
-write.csv(ipa_significant, "URA_TSTd2vsSaline_fdrsig_648size.csv", row.names = F) # clusters with adj. p-value <= 0.05
+write.csv(ipa_significant, "data/URA_TSTd2vsSaline_fdrsig_648size.csv", row.names = F) # clusters with adj. p-value <= 0.05
 
 # prepare input files for Gephi
 # add correlation analysis outcome to filtered IPA results
@@ -129,7 +129,7 @@ node.df <- data.frame(Id = c(UR,gene),
                       Class = c(class.UR, class.gene),
                       Weight = c(weight.UR, weight.gene))
 
-write.csv(node.df, "Nodes_TSTd2vsSaline.csv", row.names = F)
+write.csv(node.df, "data/Nodes_TSTd2vsSaline.csv", row.names = F)
 
 #########################
 ## Make an 'Edge' file ##
@@ -147,4 +147,4 @@ edge$Type <- "undirected"
 # change column names and save to file
 colnames(edge) <- c("Target", "Source", "Type")
 
-write.csv(edge, "Edges_TSTd2vsSaline.csv", row.names = F)
+write.csv(edge, "data/Edges_TSTd2vsSaline.csv", row.names = F)

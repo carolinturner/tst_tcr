@@ -1,110 +1,63 @@
+# TCRseq_script_12: identify most public and most abundant metaclones in D7 TST and Mtb-reactive T cell data from Musvosvi et al.
+
 library(tidyverse)
-library(data.table)
 
-# Step 1: extract metaclone CDR3s (mhc II) ####
-mc2 <- read.csv("data/TableS4.csv")
+## Step 1: D7 TST data ####
+d1 <- read.csv("data/metaclonotypist_results_down-sampled_beta_expanded_gr0.csv") %>%
+  filter(tissue == "TST_D7") %>%
+  group_by(mc.index) %>%
+  mutate(publicity = length(unique(sample)),
+         count_by_mc = sum(duplicate_count)) %>%
+  ungroup()
 
-mc.b <- as.vector(as.matrix(mc2[,"CDR3s"]))
-mc.b <- unlist(strsplit(mc.b,"\\|"))
-mc.b <- as.data.frame(unique(mc.b))
-colnames(mc.b) <- "CDR3"
-write.table(mc.b,"data/classII_beta_metaclone_CDR3s.csv",sep=",",col.names = F,row.names = F,quote = F)
-mc.cdr3 <- mc.b %>% pull(CDR3)
+# most public: metaclone 8 (look up in File S5 = cluster 57)
+ind1 <- d1 %>% filter(publicity == max(publicity)) %>% pull(mc.index) %>% unique()
+# most abundant: metaclone 21 (look up in File S5 = cluster 6)
+ind2 <- d1 %>% filter(count_by_mc == max(count_by_mc)) %>% pull(mc.index) %>% unique()
 
-# Step 2: down-sample published Mtb-reactive CDR3s to same number of metaclone CDR3s ####
-mtb.b <- read.csv("data/TableS2.csv") %>%
-  filter(reactivity == "Mtb" & chain == "beta") %>%
-  pull(CDR3) %>%
-  unique()
+## Step 2: data for Mtb-reactive TCRs (Musvosvi et al., Nat Med, 2023) ####
+dat <- read.csv("data/Musvosvi_TableS2.csv",row.names = 1) %>%
+  filter(flag == "GOOD") %>%
+  select(batch_bc_well,donorId,Cell.Type,Vb,Jb,CDR3b) %>%
+  na.omit() %>%
+  mutate(bioidentity = paste0(Vb,CDR3b,Jb))
+length(unique(dat$donorId)) # 70 participants
+length(unique(dat$batch_bc_well)) # 21,212 cells
 
-set.seed(12345)
-mtb.sample <- sample(mtb.b,nrow(mc.b))
+# define metaclonotypist search pattern
+mc <- read.csv("data/FileS4.csv")
+mc_regex <- mc %>% select(regex,Vs,index) %>% unique()
 
-# Step 3: quantify abundance in full repertoires ####
-data.b <- fread("data/combined_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7")) 
-
-# loop through different expansion thresholds
-for (f in c(0:1)) {
-  print(paste0("Expansion threshold: ",f))
-  # select TCRs
-  dat <- data.b %>% filter(duplicate_count >f)
-  dat$mtb <- ifelse(dat$junction_aa %in% mtb.sample, "Mtb", NA)
-  dat$mc <- ifelse(dat$junction_aa %in% mc.cdr3, "mc", NA)
-  # sum total/unique counts for each sample
-  d <- dat %>%
-    group_by(tissue,sample) %>% 
-    summarise(total.count = sum(duplicate_count)) %>%
-    ungroup()
-  
-  # sum total counts of mc and mtb hits for each sample
-  mtb <- dat %>%
-    filter(mtb == "Mtb") %>%
-    group_by(tissue,sample) %>%
-    summarise(total.mtb.count = sum(duplicate_count)) %>%
-    ungroup()
-  mc <- dat %>%
-    filter(mc == "mc") %>%
-    group_by(tissue,sample) %>%
-    summarise(total.mc.count = sum(duplicate_count)) %>%
-    ungroup()
-  
-  # merge dataframes and calculate %
-  merge.mtb <- inner_join(d,mtb) %>%
-    mutate(pct = total.mtb.count/total.count*100,
-           TCR = "published") %>%
-    select(tissue,sample,TCR,pct)
-  merge.mc <- inner_join(d,mc) %>%
-    mutate(pct = total.mc.count/total.count*100,
-           TCR = "metaclone") %>%
-    select(tissue,sample,TCR,pct)
-  
-  # merge into one summary dataframe and prep for plotting
-  summary <- rbind(merge.mtb,merge.mc)
-  write.csv(summary,paste0("data/Summary_percentage_beta_size-matched-mc-mtb_search_full-repertoires_expanded_gr",f,".csv"))
+# metaclone matches
+summary <- data.frame()
+# loop through all regex
+for (i in (1:nrow(mc_regex))){
+  # define search patterns and metaclone index
+  regex <- mc_regex[i,1]
+  V <- mc_regex[i,2]
+  index <- mc_regex[i,3]
+  # look for matches in combined data
+  print(paste0("checking metaclonotypist index ",i," of ",nrow(mc)))
+  match <- dat %>% filter(str_detect(bioidentity,regex) & str_detect(bioidentity,V))
+  # add columns to indicate match and metaclone index
+  if (dim(match)[1] != 0){
+    match$mc.index <- index
+    match$mc.match <- 1
+    # add to summary file
+    summary <- rbind(summary,match)
+  }
 }
-
-
-# Step 4: quantify abundance in down-sampled repertoires ####
-data.b <- fread("data/combined_subsampled_beta.csv.gz") %>%
-  filter(tissue %in% c("Blood","TST_D2","TST_D7"))
-
-# loop through different expansion thresholds
-for (f in c(0:1)) {
-  print(paste0("Expansion threshold: ",f))
-  # select TCRs
-  dat <- data.b %>% filter(duplicate_count >f)
-  dat$mtb <- ifelse(dat$junction_aa %in% mtb.sample, "Mtb", NA)
-  dat$mc <- ifelse(dat$junction_aa %in% mc.cdr3, "mc", NA)
-    # sum total counts for each sample
-  d <- dat %>%
-    group_by(tissue,sample) %>% 
-    summarise(total.count = sum(duplicate_count)) %>%
-    ungroup()
-  
-  # sum total counts of mc and mtb hits for each sample
-  mtb <- dat %>%
-    filter(mtb == "Mtb") %>%
-    group_by(tissue,sample) %>%
-    summarise(total.mtb.count = sum(duplicate_count)) %>%
-    ungroup()
-  mc <- dat %>%
-    filter(mc == "mc") %>%
-    group_by(tissue,sample) %>%
-    summarise(total.mc.count = sum(duplicate_count)) %>%
-    ungroup()
-  
-  # merge dataframes and calculate %
-  merge.mtb <- inner_join(d,mtb) %>%
-    mutate(pct = total.mtb.count/total.count*100,
-           TCR = "published") %>%
-    select(tissue,sample,TCR,pct)
-  merge.mc <- inner_join(d,mc) %>%
-    mutate(pct = total.mc.count/total.count*100,
-           TCR = "metaclone") %>%
-    select(tissue,sample,TCR,pct)
-  
-  # merge into one summary dataframe and prep for plotting
-  summary <- rbind(merge.mtb,merge.mc)
-  write.csv(summary,paste0("data/Summary_percentage_beta_size-matched-mc-mtb_search_down-sampled_expanded_gr",f,".csv"))
-}
+# check most public/abundant metaclones
+results <- summary %>%
+  group_by(mc.index) %>%
+  mutate(publicity = length(unique(donorId)),
+         abundance = length(unique(batch_bc_well))) %>%
+  ungroup()
+most_public <- results %>%
+  arrange(desc(publicity)) %>%
+  select(mc.index,publicity,abundance) %>%
+  slice_head(n=1) # index 156 (found in 14 participants), look up in File S5 = cluster 6171
+most_abundant <- results %>%
+  arrange(desc(abundance)) %>%
+  select(mc.index,publicity,abundance) %>%
+  slice_head(n=1) # index 100 (matching 47 cells), look up in File S5 = cluster 7654
