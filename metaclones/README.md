@@ -34,6 +34,6 @@ HLA data = Supplementary File S4 saved as `FileS4.csv`
 
 **To make:**
 * **Figure 4C-D**: Metaclones_script_1 &rarr; Metaclones_script_2 &rarr; Metaclones_script_3 and Snakefile &rarr; Metaclones_script_5 &rarr; Plotting_script_Figure4CD
-* **Figure 4F**: Metaclones_script_8 &rarr; [deepVenn] (https://www.deepvenn.com/)
+* **Figure 4F**: Metaclones_script_8 &rarr; [deepVenn](https://www.deepvenn.com/)
 * **Supplementary Figure 9A**: Metaclones_script_8
-* **Table 3**: Metaclone_Table_script
+* **Table 3**: Metaclones_Table_script
