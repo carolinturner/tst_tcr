@@ -19,7 +19,7 @@ HLA data = Supplementary File S4 saved as `FileS4.csv`
 * `Metaclones_script_9.ipynb`: Applying different filters to Gliph2 output
 
 **Notes:**
-* Down-sampling in `Metaclones_script_2` has been done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis.
+* Down-sampling in `Metaclones_script_2` has been done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis. For full reproducibility, use the down-sampled datafile `combined_subsampled_5000_10000_beta.csv.gz` provided on [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
 * `Metaclones_script_3` is run as snakemake workflow, for example with the following terminal command:
 	````console
 	$ snakemake -s Snakefile -c 8

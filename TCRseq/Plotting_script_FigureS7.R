@@ -2,6 +2,7 @@ library(tidyverse)
 library(ggplotify)
 library(pheatmap)
 library(ggpubr)
+library(rstatix)
 
 #My_Theme
 t = 8 #size of text
@@ -86,6 +87,20 @@ summary <- rbind(a,b,c,d,e) %>%
 # alpha chain data
 alpha <- summary %>% filter(chain == "alpha")
 
+blood.stats <- alpha %>%
+  filter(tissue == "Blood" & Antigen == "PPD-react.")
+blood.pct.all <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+blood.pct.uniq <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
+tstd2.stats <- alpha %>%
+  filter(tissue == "TST-2" & Antigen == "PPD-react.")
+tstd2.pct.all <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+tstd2.pct.uniq <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
 # Figure S7C: all CDR3s
 pS7C <- ggplot(alpha, aes(x=tissue,y=pct))+
   geom_boxplot(colour="red")+
@@ -131,7 +146,35 @@ summary <- rbind(a,b,c,d,e) %>%
 
 # split by chain
 beta <- summary %>% filter(chain == "beta")
+blood.stats <- beta %>%
+  filter(tissue == "Blood" & Antigen == "PPD-react.")
+blood.pct.all <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+blood.pct.uniq <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
+tstd2.stats <- beta %>%
+  filter(tissue == "TST-2" & Antigen == "PPD-react.")
+tstd2.pct.all <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+tstd2.pct.uniq <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
 alpha <- summary %>% filter(chain == "alpha")
+blood.stats <- alpha %>%
+  filter(tissue == "Blood" & Antigen == "PPD-react.")
+blood.pct.all <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+blood.pct.uniq <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
+tstd2.stats <- alpha %>%
+  filter(tissue == "TST-2" & Antigen == "PPD-react.")
+tstd2.pct.all <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+tstd2.pct.uniq <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
 
 # Figure S7E: all CDR3s alpha
 pS7E <- ggplot(alpha, aes(x=tissue,y=pct))+

@@ -1,5 +1,14 @@
 # TCRseq_Script_1: Pre-processing of bulk TCRseq data
 
+## input data:
+# download TCRseq data and metadata from UCL's Research Data Repository: DOI 10.5522/04/28049606
+# download HLA data from manuscript, save as FileS4.csv
+# save all source data in a sub-directory called data
+
+## note:
+# for convenience, combined full and down-sampled repertoires have also been provided on UCL's RDR
+# if using provided 'combined' files, can skip Steps 2, 3 and 4 for both datasets
+
 ## Dataset 1:
 # - bulk TCRseq of blood, TST and in vitro stimulated PBMC
 # - acquired with UCL Chain lab protocol
@@ -10,15 +19,10 @@
 # - acquired with ImmunoSeq protocol
 # - pre-processing: tidy metadata, combine samples in one file
 
-## input data:
-# download TCRseq data and metadata from UCL's Research Data Repository: DOI 10.5522/04/28049606
-# download HLA data from manuscript, save as FileS4.csv
-# save all source data in a sub-directory called data
-
 library(tidyverse)
 library(data.table)
 
-## Dataset 1:
+## Dataset 1: ####
 # Step 1: make tidy metadata and HLA files ####
 # metadata
 meta <- read.csv("data/metadata.csv") %>%
@@ -182,7 +186,7 @@ for (chain in c("alpha","beta")){
 }
 
 
-## Dataset 2:
+## Dataset 2: ####
 # Step 1: make tidy metadata file ####
 # metadata
 meta <- read.csv("data/metadata.csv") %>%

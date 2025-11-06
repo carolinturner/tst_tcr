@@ -2,6 +2,7 @@ library(tidyverse)
 library(ggplotify)
 library(pheatmap)
 library(ggpubr)
+library(rstatix)
 
 #My_Theme
 t = 8 #size of text
@@ -87,6 +88,20 @@ summary <- rbind(a,b,c,d,e) %>%
 
 # beta chain data
 beta <- summary %>% filter(chain == "beta")
+
+blood.stats <- beta %>%
+  filter(tissue == "Blood" & Antigen == "PPD-reactive")
+blood.pct.all <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+blood.pct.uniq <- blood.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+
+tstd2.stats <- beta %>%
+  filter(tissue == "Day 2 TST" & Antigen == "PPD-reactive")
+tstd2.pct.all <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
+tstd2.pct.uniq <- tstd2.stats %>%
+  pairwise_wilcox_test(data = ., pct.unique~Clone.Size, paired = TRUE, p.adjust.method = "fdr")
 
 # Figure 3C: all CDR3s
 p3C <- ggplot(beta, aes(x=tissue,y=pct))+

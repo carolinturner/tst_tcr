@@ -4,7 +4,7 @@ The scripts provided here were used for TCRseq analyses in the TST TCR manuscrip
 `TCRseq_scripts` generate the data required for `Plotting_scripts` to make Figures 2-5 and Supplementary Figures S3-S11 as detailed below. Figures 4 and S7 were assembled in Inkscape. _TCRseq_Table_script_ makes Table 2.
 
 **Input data:**
-* At time of peer-reviewer publication of the manuscript, processed TCRseq data and metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
+* At time of peer-reviewed publication of the manuscript, processed TCRseq data and metadata can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
 * Antigen-reactive CDR3 sequences collated from published sources are available as Supplementary File S3 of the manuscript.
 * HLA imputations for participants are available as Supplementary File S4.
 * Metaclone summaries (including HLA association and regular expression patterns) are available as Supplementary Files S5-S8. These metaclones were discovered using the code available in the metaclone directory of this GitHub repository.
