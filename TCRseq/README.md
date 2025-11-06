@@ -34,7 +34,7 @@ The scripts provided here were used for TCRseq analyses in the TST TCR manuscrip
 * `TCRseq_script_9` was adapted from code by Prof Benny Chain. This script also produces **Figure S7A**.
 * `TCRseq_script_12` identifies the index of selected metaclones. Their cluster number can be looked up in Supplementary File S5. The associated adjacency graphs and sequence logos, identifiable by metaclone cluster number, can then be found in the output produced by `Metaclones_script_5` from the metaclone directory of this repository, and are displayed in **Figure 4E** and **Supplementary Figure 9B**.
 
-** To make tables:**
+**To make tables:**
 * **Table 2**: TCRseq_Table_script.R
 
 **To make main figures:**
