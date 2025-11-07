@@ -6,8 +6,10 @@ At time of peer-reviewed publication of the manuscript, the processed TCRseq dat
  
 Metadata = `metadata.csv`
 HLA data = Supplementary File S4 saved as `FileS4.csv`
+VDJdb data = `vdjdb_full.txt` downloaded [here](https://github.com/antigenomics/vdjdb-db/releases) (version vdjdb-2024-06-13.zip)
 
 **Overview of analysis scripts:**
+* `Metaclones_script_0.ipynb`: Benchmarking accuracy of Metaclonotypist using TCRs specific to distinct pMHCs from VDJdb
 * `Metaclones_script_1.R`: Re-format HLA imputation data
 * `Metaclones_script_2.ipynb`: Prepare data for metaclone discovery (including down-sampling)
 * `Metaclones_script_3.py` and `Snakefile`: Parameter sweep to identify optimal Metaclonotypist parameters for this dataset
@@ -19,7 +21,8 @@ HLA data = Supplementary File S4 saved as `FileS4.csv`
 * `Metaclones_script_9.ipynb`: Applying different filters to Gliph2 output
 
 **Notes:**
-* Down-sampling in `Metaclones_script_2` has been done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis. For full reproducibility, use the down-sampled datafile `combined_subsampled_5000_10000_beta.csv.gz` provided on [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
+* Random subsampling from VDJdb in `Metaclones_script_0` was done without setting a reproducibility seed, so results won't be reproduced numerically exactly to the same digits.
+* Down-sampling in `Metaclones_script_2` was done without setting a reproducibility seed. Downstream outputs may therefore differ slightly from our published analysis. For full reproducibility, use the down-sampled datafile `combined_subsampled_5000_10000_beta.csv.gz` provided on [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public).
 * `Metaclones_script_3` is run as snakemake workflow, for example with the following terminal command:
 	````console
 	$ snakemake -s Snakefile -c 8
@@ -33,6 +36,7 @@ HLA data = Supplementary File S4 saved as `FileS4.csv`
 * Change `mhc_class` in repeated runs of `Metaclones_script_8` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 
 **To make:**
+* **Figure 4B**: Metaclones_script_0
 * **Figure 4C-D**: Metaclones_script_1 &rarr; Metaclones_script_2 &rarr; Metaclones_script_3 and Snakefile &rarr; Metaclones_script_5 &rarr; Plotting_script_Figure4CD
 * **Figure 4F**: Metaclones_script_8 &rarr; [deepVenn](https://www.deepvenn.com/)
 * **Supplementary Figure 9A**: Metaclones_script_8
