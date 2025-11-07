@@ -3,10 +3,10 @@
 The scripts provided here were adapted from code written by Dr Andreas Mayer-Tiffeau, and used for metaclone discovery analyses in the TST TCR manuscript, to identify metaclonotypist- and GLIPH2-derived T cell metaclones. The output of these scripts is required as input for some of the _TCRseq_scripts_ and _Plotting_scripts_ listed in the TCRseq directory of this GitHub repository. Relevant output tables are also summarised in Supplementary Files S5-S8 of the manuscript. 
 
 At time of peer-reviewed publication of the manuscript, the processed TCRseq data and associated metadata that are needed to run the scripts can be downloaded from [UCL's Research Data Repository](add here link to DOI 10.5522/04/28049606 once public). HLA imputations for participants are available as Supplementary File S4 of the manuscript. All source data should be saved in a subdirectory called `data`.
- 
-Metadata = `metadata.csv`
-HLA data = Supplementary File S4 saved as `FileS4.csv`
-VDJdb data = `vdjdb_full.txt` downloaded [here](https://github.com/antigenomics/vdjdb-db/releases) (version vdjdb-2024-06-13.zip)
+
+**Additional input data:** 
+* HLA data = Supplementary File S4 saved as `FileS4.csv`
+* VDJdb data = `vdjdb_full.txt` downloaded [here](https://github.com/antigenomics/vdjdb-db/releases) (version vdjdb-2024-06-13.zip)
 
 **Overview of analysis scripts:**
 * `Metaclones_script_0.ipynb`: Benchmarking accuracy of Metaclonotypist using TCRs specific to distinct pMHCs from VDJdb
