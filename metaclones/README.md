@@ -33,7 +33,7 @@ All source data should be saved in a subdirectory called `data`.
 * `Metaclones_script_4` combines all output files from the `results` folder into one data frame.
 * Change `MHC class` in repeated runs of `Metaclones_script_5` to test separately for MHC II or MHC I associations in metaclonotypist analysis. 
 * Repeated analysis of the same dataset using metaclonotypist (`Metaclones_script_5`) with identical settings may result in slightly different results. This is due to stochasticity of the Leiden clustering step of the metaclonotypist function, implemented through `igraph`, where no reproducibility seed can be supplied.
-* Install Gliph2 in a Linux or Mac environment (http://50.255.35.37:8080/tools) before running `Script_6`
+* Install Gliph2 in a Linux or Mac environment (http://50.255.35.37:8080/tools) before running `Metaclones_script_6`
 * Change `mhc_class` in repeated runs of `Metaclones_script_6` to test separately MHC II or MHC I associations of Gliph2 patterns.
 * Change `mhc_class` in repeated runs of `Metaclones_script_8` to process separately Gliph2 outputs of MHC II and MHC I associated gliph patterns.
 

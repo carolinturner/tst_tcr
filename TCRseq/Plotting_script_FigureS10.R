@@ -26,7 +26,7 @@ My_Theme = theme(
   panel.spacing.x = unit(0.05,"cm")
 )
 
-dat <- read.csv("data/Figure10B_odds-ratio_gliph-filters.csv") %>%
+dat <- read.csv("data/FigureS10B_odds-ratio_gliph-filters.csv") %>%
   mutate(Log10.OR=log10(oddsratio),
          Log10.ORLL=log10(CI_lower),
          Log10.ORUL=log10(CI_higher),

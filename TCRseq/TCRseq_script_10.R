@@ -9,6 +9,7 @@ d1 <- read.csv("data/gliph2_filter1.csv") # Gliph2 + Filter 1
 d2 <- read.csv("data/gliph2_filter1+2.csv") %>% filter(pvalue < 0.05) # Gliph2 + Filter 1 + Filter 2 (p<0.05) 
 d3 <- read.csv("data/gliph2_filter1+2.csv") %>% filter(significant == "True") # Gliph2 + Filter 1 + Filter 2 (FDR<0.1)
 d4 <- read.csv("data/FileS7.csv") # Gliph2 + Filter 2 (FDR<0.1)
+# in contrast to Gliph2 output shown in Figure 5A, pattern 'G.T' is retained in the analysis here
 
 # summary stats to manually populate table for Figure S10A
 # number of clusters
@@ -66,11 +67,11 @@ write.csv(merge2,paste0("data/Validation_PBMC-bulk_gliph-filter_set2_results_bet
 
 merge3 <- inner_join(df,mc.dat3) # samples with no metaclones discarded
 merge3 <- merge3 %>% mutate(mc.pct.total = round(total.mc.count/total.count*100,3))
-write.csv(merge3,paste0("Validation_PBMC-bulk_gliph-filter_set3_results_beta.csv"),row.names = F)
+write.csv(merge3,paste0("data/Validation_PBMC-bulk_gliph-filter_set3_results_beta.csv"),row.names = F)
 
 merge4 <- inner_join(df,mc.dat4) # samples with no metaclones discarded
 merge4 <- merge4 %>% mutate(mc.pct.total = round(total.mc.count/total.count*100,3))
-write.csv(merge4,paste0("Validation_PBMC-bulk_gliph-filter_set4_results_beta.csv"),row.names = F)
+write.csv(merge4,paste0("data/Validation_PBMC-bulk_gliph-filter_set4_results_beta.csv"),row.names = F)
 
 ## DATASET 2: sc-TCRseq of Mtb-reactive T cells (Musvosvi, Nat Med, 2023) ####
 dat <- read.csv("data/Musvosvi_TableS2.csv",row.names = 1) %>%

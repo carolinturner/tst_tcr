@@ -42,7 +42,6 @@ The scripts provided here were used for TCRseq analyses in the TST TCR manuscrip
 * **Figure 2B**: TCRseq_script_1 &rarr; TCRseq_script_3 &rarr; Plotting_script_Figure2
 * **Figure 2C-E**: TCRseq_script_1 &rarr; TCRseq_script_5 &rarr; Plotting_script_Figure2
 * **Figure 3**: TCRseq_script_1 &rarr; TCRseq_script_7 &rarr; TCRseq_script_8 &rarr; Plotting_script_Figure3
-* **Figure 4E**:
 * **Figure 5A**: TCRseq_script_1 &rarr; Metaclones_script_2 &rarr; TCRseq_script_12 &rarr; Plotting_script_Figure5
 * **Figure 5B**: TCRseq_script_1 &rarr; TCRseq_script_10 &rarr; Plotting_script_Figure5 
 * **Figure 5C**: TCRseq_script_1 &rarr; TCRseq_script_7 and TCRseq_script_8 &rarr; TCRseq_script_14 &rarr; Plotting_script_Figure5
